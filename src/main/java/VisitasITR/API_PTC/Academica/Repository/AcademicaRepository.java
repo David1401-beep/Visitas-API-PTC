@@ -1,4 +1,4 @@
 package VisitasITR.API_PTC.Academica.Repository;
 
-public class AcademicaRepository {
+public interface AcademicaRepository {
 }

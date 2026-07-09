@@ -1,4 +1,4 @@
 package VisitasITR.API_PTC.Docente.Repository;
 
-public class DocenteRepositiory {
+public interface DocenteRepository {
 }
