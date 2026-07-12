@@ -1,4 +1,7 @@
 package VisitasITR.API_PTC.Docente.Repository;
 
-public interface DocenteRepository {
+import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DocenteRepository extends JpaRepository<DocenteEntity, Long> {
 }
