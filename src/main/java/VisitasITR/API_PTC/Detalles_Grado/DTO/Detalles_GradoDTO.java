@@ -10,9 +10,9 @@ public class Detalles_GradoDTO {
 
     private Long id;
 
-    @NotNull (message = "ERRO1: El número de detalle grado es obligatorio")
+    @NotNull (message = "El número de detalle grado es obligatorio")
     private Integer detalleGrado;
 
-    @NotNull (message = "ERRO2: El ID del grupo es obligatorio")
+    @NotNull (message = "El ID del grupo es obligatorio")
     private  Long idGrupo;
 }
