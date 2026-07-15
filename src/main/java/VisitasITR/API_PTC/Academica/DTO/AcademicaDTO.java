@@ -12,7 +12,7 @@ public class AcademicaDTO {
 
     private Long idAcademica;
 
-    @NotBlank(message = "ERROR: El campo Academica es obligatorio")
+    @NotBlank(message = "El campo Academica es obligatorio")
     private String academica;
 
 }
