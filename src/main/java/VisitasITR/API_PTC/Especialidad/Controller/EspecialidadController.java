@@ -37,7 +37,6 @@ public class EspecialidadController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminar(@PathVariable Integer id){
         service.eliminar(id);
-
         return ResponseEntity.ok("especialidad eliminada correctamente");
     }
 
