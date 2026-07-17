@@ -38,7 +38,6 @@ public class Detalles_GradoController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Detalles_GradoDTO>>> obtenerDatosGrado(){
         try {
-            //
             List<Detalles_GradoDTO> lista = service.obteerDatosGrado();
             ApiResponse<List<Detalles_GradoDTO>> respuestaBuena = new ApiResponse<>(true, "Proceso completado", lista);
             return new ResponseEntity<>(respuestaBuena,HttpStatus.OK);

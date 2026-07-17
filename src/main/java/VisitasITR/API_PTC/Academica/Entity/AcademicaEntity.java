@@ -1,4 +1,5 @@
 package VisitasITR.API_PTC.Academica.Entity;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,3 @@ public class AcademicaEntity {
     @Column(name = "Academica", nullable = false)
     private String academica;
 }
-
-
-
