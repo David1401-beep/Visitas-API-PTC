@@ -1,44 +1,65 @@
 package VisitasITR.API_PTC.Especialidad.Controller;
 
 import VisitasITR.API_PTC.Especialidad.DTO.EspecialidadDTO;
-import VisitasITR.API_PTC.Estudiante.Service.EstudianteService;
-import org.springframework.beans.factory.annotation.Autowired;
+import VisitasITR.API_PTC.Especialidad.Entity.EspecialidadEntity;
+import VisitasITR.API_PTC.Especialidad.Services.EspecialidadService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/especialidad")
-@CrossOrigin("*")
-
+@RequestMapping("/api/v1/especialidades")
+@RequiredArgsConstructor
 public class EspecialidadController {
-    @Autowired
-    private EstudianteService service;
+
+    private final EspecialidadService especialidadService;
 
     @GetMapping
-    public ResponseEntity<List<EspecialidadDTO>> listar(){
-        return ResponseEntity.ok(service.listar());
+    public ResponseEntity<List<EspecialidadEntity>> listar() {
+        return ResponseEntity.ok(especialidadService.listarTodos());
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<EspecialidadDTO> obtener(@PathVariable Integer id){
-        return ResponseEntity.ok(service.obtenerPorId(id));
+    public ResponseEntity<EspecialidadEntity> obtenerPorId(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(especialidadService.buscarPorId(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping
-    public ResponseEntity<EspecialidadDTO> guardar(@RequestBody EspecialidadDTO dto){
-        return ResponseEntity.ok(service.guardar(dto));
+    public ResponseEntity<EspecialidadEntity> crear(@Valid @RequestBody EspecialidadDTO dto) {
+        try {
+            EspecialidadEntity nuevo = especialidadService.guardar(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<EspecialidadDTO> actualizar(@PathVariable Integer id,
-                                                      @RequestBody EspecialidadDTO dto){
-        return ResponseEntity.ok(service.actualizar(id, dto));
+    public ResponseEntity<EspecialidadEntity> actualizar(@PathVariable Long id, @Valid @RequestBody EspecialidadDTO dto) {
+        try {
+            return ResponseEntity.ok(especialidadService.actualizar(id, dto));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminar(@PathVariable Integer id){
-        service.eliminar(id);
-        return ResponseEntity.ok("especialidad eliminada correctamente");
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        try {
+            especialidadService.eliminar(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
-
-
 }

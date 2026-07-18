@@ -1,18 +1,18 @@
 package VisitasITR.API_PTC.Academica.DTO;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
-@Getter
-@Setter
-@ToString
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AcademicaDTO {
 
     private Long idAcademica;
 
-    @NotBlank(message = "ERROR: El campo Academica es obligatorio")
-    private String academica;
-
+    @NotBlank(message = "El nombre de la sección académica es obligatorio")
+    @Size(max = 2, message = "La sección no puede superar los 2 caracteres")
+    private String seccion;
 }

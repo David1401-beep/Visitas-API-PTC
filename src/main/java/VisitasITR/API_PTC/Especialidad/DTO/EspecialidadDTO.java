@@ -1,14 +1,18 @@
 package VisitasITR.API_PTC.Especialidad.DTO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class EspecialidadDTO {
 
-    private Integer idEspecialidad;
-    private String especialidad;
+    private Long idEspecialidad;
 
+    @NotBlank(message = "El nombre de la especialidad es obligatorio")
+    @Size(max = 40, message = "La especialidad no puede superar los 40 caracteres")
+    private String especialidad;
 }

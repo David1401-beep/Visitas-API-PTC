@@ -1,29 +1,24 @@
 package VisitasITR.API_PTC.Docente.Entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
-@Getter @Setter @ToString
 @Table(name = "DOCENTE")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DocenteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_DOCENTE")
-    private Long Id;
+    private Long idDocente;
 
-    @Column(name = "DOC_APELLIDO")
-    private String docNombre;
+    @Column(name = "DOC_NOMBRE", nullable = false, length = 50)
+    private String nombre;
 
-    @Column(name = "DOC_APELLIDO")
-    private String docApellido;
-
-    @Column(name = "DOC_CORREO", unique = true)
-    private String docCorreo;
-
-    @Column(name = "DOC_ROL")
-    private String docRol;
+    @Column(name = "DOC_APELLIDO", nullable = false, length = 50)
+    private String apellido;
 }

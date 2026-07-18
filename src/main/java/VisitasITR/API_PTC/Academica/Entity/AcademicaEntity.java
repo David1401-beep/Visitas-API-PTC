@@ -1,20 +1,21 @@
 package VisitasITR.API_PTC.Academica.Entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "ACADEMICA")
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AcademicaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_Academica")
+    @Column(name = "ID_ACADEMICA")
     private Long idAcademica;
 
-    @Column(name = "Academica", nullable = false)
-    private String academica;
+    @Column(name = "SECCION", nullable = false, length = 2) // Ej: "A", "B", "C"
+    private String seccion;
 }

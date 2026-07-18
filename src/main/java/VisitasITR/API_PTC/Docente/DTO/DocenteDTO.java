@@ -1,27 +1,22 @@
 package VisitasITR.API_PTC.Docente.DTO;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
-@Getter @Setter @ToString
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DocenteDTO {
 
-    private Long id;
+    private Long idDocente;
 
     @NotBlank(message = "El nombre del docente es obligatorio")
-    private String docNombre;
+    @Size(max = 50, message = "El nombre no puede superar los 50 caracteres")
+    private String nombre;
 
     @NotBlank(message = "El apellido del docente es obligatorio")
-    private String docApellido;
-
-    @NotBlank(message = "El correo del docente es obligatorio")
-    @Email(message = "Debe ser un formato de correo electrónico válido")
-    private String docCorreo;
-
-    @NotBlank(message = "El rol del docente es obligatorio")
-    private String docRol;
-
+    @Size(max = 50, message = "El apellido no puede superar los 50 caracteres")
+    private String apellido;
 }

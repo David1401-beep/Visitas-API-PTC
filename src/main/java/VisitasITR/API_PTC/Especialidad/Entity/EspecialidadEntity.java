@@ -1,12 +1,12 @@
 package VisitasITR.API_PTC.Especialidad.Entity;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "ESPECIALIDAD")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class EspecialidadEntity {
@@ -14,10 +14,8 @@ public class EspecialidadEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ESPECIALIDAD")
-    private Integer idEspecialidad;
+    private Long idEspecialidad;
 
-    @Column(name = "ESPECIALIDAD", nullable = false, length = 100)
+    @Column(name = "ESPECIALIDAD", nullable = false, length = 40) // Ej: "Desarrollo de Software"
     private String especialidad;
-
 }
-

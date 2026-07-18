@@ -1,13 +1,14 @@
 package VisitasITR.API_PTC.Nivel.Entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "NIVEL")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class NivelEntity {
 
     @Id
@@ -15,6 +16,6 @@ public class NivelEntity {
     @Column(name = "ID_NIVEL")
     private Long idNivel;
 
-    @Column(name = "NIVEL")
-    private Integer nivel;
+    @Column(name = "NIVEL", length = 20)
+    private String nivel;
 }
