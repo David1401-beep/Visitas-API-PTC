@@ -20,7 +20,7 @@ public class DetalleGradoServiceImpl implements DetalleGradoService {
 
     private final DetalleGradoRepository detalleGradoRepository;
     private final GradoRepository gradoRepository;
-    private final AcademicaRepository academicaRepository; // Asume que tienes el repositorio de Academica
+    private final AcademicaRepository academicaRepository;
 
     @Override
     @Transactional(readOnly = true)

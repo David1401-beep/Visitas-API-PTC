@@ -22,7 +22,7 @@ public class EncargadoEntity {
     @Column(name = "ENC_APELLIDO", nullable = false, length = 50)
     private String apellido;
 
-    @Column(name = "ENC_TELEFONO", length = 9) // Ajustado para formato de teléfono local (####-####)
+    @Column(name = "ENC_TELEFONO", length = 9)
     private String telefono;
 
     @Column(name = "ENC_CORREO", length = 50)

@@ -16,6 +16,6 @@ public class EspecialidadEntity {
     @Column(name = "ID_ESPECIALIDAD")
     private Long idEspecialidad;
 
-    @Column(name = "ESPECIALIDAD", nullable = false, length = 40) // Ej: "Desarrollo de Software"
+    @Column(name = "ESPECIALIDAD", nullable = false, length = 40)
     private String especialidad;
 }

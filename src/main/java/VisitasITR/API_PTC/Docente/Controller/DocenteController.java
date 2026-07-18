@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/docentes") // Rutas en plural y versionadas
+@RequestMapping("/api/docentes")
 @RequiredArgsConstructor
 public class DocenteController {
 
@@ -21,27 +21,27 @@ public class DocenteController {
 
     @GetMapping
     public ResponseEntity<List<DocenteEntity>> listar() {
-        return ResponseEntity.ok(docenteService.listarTodos()); // 200 OK
+        return ResponseEntity.ok(docenteService.listarTodos());
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<DocenteEntity> obtenerPorId(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(docenteService.buscarPorId(id)); // 200 OK
+            return ResponseEntity.ok(docenteService.buscarPorId(id));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
 
     @PostMapping
-    public ResponseEntity<DocenteEntity> crear(@Valid @RequestBody DocenteDTO dto) { // @Valid intercepta datos corruptos
+    public ResponseEntity<DocenteEntity> crear(@Valid @RequestBody DocenteDTO dto) {
         try {
             DocenteEntity nuevo = docenteService.guardar(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevo); // 201 Created
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // 400 Bad Request
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -50,11 +50,11 @@ public class DocenteController {
     public ResponseEntity<DocenteEntity> actualizar(@PathVariable Long id, @Valid @RequestBody DocenteDTO dto) {
         try {
             DocenteEntity actualizado = docenteService.actualizar(id, dto);
-            return ResponseEntity.ok(actualizado); // 200 OK
+            return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // 400 Bad Request
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -63,9 +63,9 @@ public class DocenteController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         try {
             docenteService.eliminar(id);
-            return ResponseEntity.noContent().build(); // 204 No Content (Ideal para borrado exitoso)
+            return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

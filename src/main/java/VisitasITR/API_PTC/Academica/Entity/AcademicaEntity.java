@@ -16,6 +16,6 @@ public class AcademicaEntity {
     @Column(name = "ID_ACADEMICA")
     private Long idAcademica;
 
-    @Column(name = "SECCION", nullable = false, length = 2) // Ej: "A", "B", "C"
+    @Column(name = "SECCION", nullable = false, length = 2)
     private String seccion;
 }

@@ -28,7 +28,7 @@ public class GradoEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_TECNICA")
-    private SeccionTecnicaEntity seccionTecnica; // Corregido a SeccionTecnicaEntity
+    private SeccionTecnicaEntity seccionTecnica;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_ESPECIALIDAD")
