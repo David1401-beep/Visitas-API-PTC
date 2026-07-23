@@ -7,6 +7,7 @@ import VisitasITR.API_PTC.Academica.Services.AcademicaService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,6 +88,7 @@ public class AcademicaServiceImpl implements AcademicaService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
         if (academicaRepository.existsById(id)) {
             academicaRepository.deleteById(id);

@@ -73,7 +73,12 @@ public class MateriaServiceImpl implements MateriaService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (materiaRepository.existsById(id)) {
+            materiaRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

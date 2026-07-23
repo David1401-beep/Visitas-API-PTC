@@ -85,7 +85,12 @@ public class EncargadoServiceImpl implements EncargadoService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (encargadoRepository.existsById(id)) {
+            encargadoRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

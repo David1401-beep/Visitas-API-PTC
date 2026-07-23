@@ -71,7 +71,12 @@ public class NivelServiceImpl implements NivelService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (nivelRepository.existsById(id)) {
+            nivelRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

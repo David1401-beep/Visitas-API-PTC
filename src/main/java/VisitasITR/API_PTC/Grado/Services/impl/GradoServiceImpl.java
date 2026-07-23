@@ -104,7 +104,12 @@ public class GradoServiceImpl implements GradoService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (gradoRepository.existsById(id)) {
+            gradoRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

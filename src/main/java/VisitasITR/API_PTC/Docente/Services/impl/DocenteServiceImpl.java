@@ -77,7 +77,12 @@ public class DocenteServiceImpl implements DocenteService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (docenteRepository.existsById(id)) {
+            docenteRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

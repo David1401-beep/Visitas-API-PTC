@@ -70,7 +70,12 @@ public class SeccionTecnicaServiceImpl implements SeccionTecnicaService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (seccionTecnicaRepository.existsById(id)) {
+            seccionTecnicaRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

@@ -106,7 +106,12 @@ public class MateriaDocenteServiceImpl implements MateriaDocenteService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (materiaDocenteRepository.existsById(id)) {
+            materiaDocenteRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

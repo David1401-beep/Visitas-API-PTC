@@ -98,7 +98,12 @@ public class DetalleGradoServiceImpl implements DetalleGradoService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (detalleGradoRepository.existsById(id)) {
+            detalleGradoRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

@@ -97,7 +97,12 @@ public class EstudianteServiceImpl implements EstudianteService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (estudianteRepository.existsById(id)) {
+            estudianteRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

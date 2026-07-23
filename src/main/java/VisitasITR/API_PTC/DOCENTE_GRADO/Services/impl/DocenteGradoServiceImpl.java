@@ -106,7 +106,12 @@ public class DocenteGradoServiceImpl implements DocenteGradoService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (docenteGradoRepository.existsById(id)) {
+            docenteGradoRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

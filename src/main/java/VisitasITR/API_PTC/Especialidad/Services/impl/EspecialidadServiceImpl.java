@@ -71,7 +71,12 @@ public class EspecialidadServiceImpl implements EspecialidadService {
     }
 
     @Override
+    @Transactional
     public boolean eliminar2(Long id) {
+        if (especialidadRepository.existsById(id)) {
+            especialidadRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

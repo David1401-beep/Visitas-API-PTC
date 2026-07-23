@@ -147,7 +147,7 @@ public class DetalleGradoController {
         } catch (Exception e) {
             System.out.println(" ERROR: " + e.getMessage());
             respuesta = new ApiResponse<>(false, "Error al intentar eliminar el detalle de grado.", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
         }
     }
 }
