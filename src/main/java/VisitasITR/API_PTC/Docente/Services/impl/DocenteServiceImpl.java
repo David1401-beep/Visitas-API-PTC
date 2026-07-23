@@ -35,6 +35,10 @@ public class DocenteServiceImpl implements DocenteService {
         DocenteEntity docente = DocenteEntity.builder()
                 .nombre(dto.getNombre())
                 .apellido(dto.getApellido())
+                .clave(dto.getClave())
+                .correo(dto.getCorreo())
+                .rol(dto.getRol())
+                .tipo(dto.getTipo())
                 .build();
         return docenteRepository.save(docente);
     }
@@ -45,6 +49,10 @@ public class DocenteServiceImpl implements DocenteService {
         DocenteEntity docente = buscarPorId(id);
         docente.setNombre(dto.getNombre());
         docente.setApellido(dto.getApellido());
+        docente.setClave(dto.getClave());
+        docente.setCorreo(dto.getCorreo());
+        docente.setRol(dto.getRol());
+        docente.setTipo(dto.getTipo());
         return docenteRepository.save(docente);
     }
 
@@ -66,6 +74,18 @@ public class DocenteServiceImpl implements DocenteService {
         if (dto.getApellido() != null && !dto.getApellido().isBlank()) {
             entidadExistente.setApellido(dto.getApellido());
         }
+        if (dto.getClave() != null && !dto.getClave().isBlank()) {
+            entidadExistente.setClave(dto.getClave());
+        }
+        if (dto.getCorreo() != null && !dto.getCorreo().isBlank()) {
+            entidadExistente.setCorreo(dto.getCorreo());
+        }
+        if (dto.getRol() != null && !dto.getRol().isBlank()) {
+            entidadExistente.setRol(dto.getRol());
+        }
+        if (dto.getTipo() != null && !dto.getTipo().isBlank()) {
+            entidadExistente.setTipo(dto.getTipo());
+        }
 
         DocenteEntity actualizado = docenteRepository.save(entidadExistente);
 
@@ -73,6 +93,10 @@ public class DocenteServiceImpl implements DocenteService {
         respuestaDTO.setIdDocente(actualizado.getIdDocente());
         respuestaDTO.setNombre(actualizado.getNombre());
         respuestaDTO.setApellido(actualizado.getApellido());
+        respuestaDTO.setClave(actualizado.getClave());
+        respuestaDTO.setCorreo(actualizado.getCorreo());
+        respuestaDTO.setRol(actualizado.getRol());
+        respuestaDTO.setTipo(actualizado.getTipo());
         return respuestaDTO;
     }
 

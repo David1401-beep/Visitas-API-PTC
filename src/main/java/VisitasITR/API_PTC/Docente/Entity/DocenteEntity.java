@@ -21,4 +21,16 @@ public class DocenteEntity {
 
     @Column(name = "DOC_APELLIDO", nullable = false, length = 50)
     private String apellido;
+
+    @Column(name = "DOC_CLAVE", nullable = false, length = 10)
+    private String clave;
+
+    @Column(name = "DOC_CORREO", nullable = false, unique = true, length = 100)
+    private String correo;
+
+    @Column(name = "DOC_ROL", nullable = false, length = 50)
+    private String rol;
+
+    @Column(name = "TIPO_DOCENTE", length = 20)
+    private String tipo;
 }

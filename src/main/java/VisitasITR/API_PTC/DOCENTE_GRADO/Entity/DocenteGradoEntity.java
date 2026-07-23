@@ -25,5 +25,8 @@ public class DocenteGradoEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_GRADO", nullable = false)
     private GradoEntity grado;
+
+    @Column(name = "ANIO_ESCOLAR", nullable = false)
+    private Integer anioEscolar;
 }
 

@@ -16,5 +16,8 @@ public class DocenteGradoDTO {
 
     @NotNull(message = "El ID del grado es obligatorio")
     private Long idGrado;
+
+    @NotNull(message = "El año escolar es obligatorio")
+    private Integer anioEscolar;
 }
 

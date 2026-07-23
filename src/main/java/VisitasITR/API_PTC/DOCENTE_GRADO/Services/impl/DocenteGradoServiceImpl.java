@@ -47,6 +47,7 @@ public class DocenteGradoServiceImpl implements DocenteGradoService {
         DocenteGradoEntity relacion = DocenteGradoEntity.builder()
                 .docente(docente)
                 .grado(grado)
+                .anioEscolar(dto.getAnioEscolar())
                 .build();
 
         return docenteGradoRepository.save(relacion);
@@ -65,6 +66,7 @@ public class DocenteGradoServiceImpl implements DocenteGradoService {
 
         relacion.setDocente(docente);
         relacion.setGrado(grado);
+        relacion.setAnioEscolar(dto.getAnioEscolar());
 
         return docenteGradoRepository.save(relacion);
     }
@@ -91,6 +93,9 @@ public class DocenteGradoServiceImpl implements DocenteGradoService {
                     .orElseThrow(() -> new RuntimeException("Grado no encontrado con ID: " + dto.getIdGrado()));
             entidadExistente.setGrado(grado);
         }
+        if (dto.getAnioEscolar() != null) {
+            entidadExistente.setAnioEscolar(dto.getAnioEscolar());
+        }
 
         DocenteGradoEntity actualizado = docenteGradoRepository.save(entidadExistente);
 
@@ -102,6 +107,7 @@ public class DocenteGradoServiceImpl implements DocenteGradoService {
         if (actualizado.getGrado() != null) {
             respuestaDTO.setIdGrado(actualizado.getGrado().getIdGrado());
         }
+        respuestaDTO.setAnioEscolar(actualizado.getAnioEscolar());
         return respuestaDTO;
     }
 

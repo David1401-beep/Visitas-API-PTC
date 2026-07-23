@@ -2,6 +2,7 @@ package VisitasITR.API_PTC.Encargado.DTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -12,6 +13,9 @@ import lombok.*;
 public class EncargadoDTO {
 
     private Long idEncargado;
+
+    @NotNull(message = "El ID de usuario es obligatorio")
+    private Long idUsuario;
 
     @NotBlank(message = "El nombre del encargado es obligatorio")
     @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")

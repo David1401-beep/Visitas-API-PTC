@@ -1,5 +1,6 @@
 package VisitasITR.API_PTC.Estudiante.Entity;
 
+import VisitasITR.API_PTC.Academica.Entity.AcademicaEntity;
 import VisitasITR.API_PTC.Detalle_Grado.Entity.DetalleGradoEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,22 @@ public class EstudianteEntity {
 
     @Column(name = "EST_APELLIDO", nullable = false, length = 50)
     private String apellido;
+
+    @Column(name = "EST_GRADO", length = 30)
+    private String grado;
+
+    @Column(name = "EST_SECCION", length = 10)
+    private String seccion;
+
+    @Column(name = "EST_ESPECIALIDAD", length = 60)
+    private String especialidad;
+
+    @Column(name = "EST_CODIGO", length = 20)
+    private String codigo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_ACADEMICA", nullable = false)
+    private AcademicaEntity academica;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_DETALLE_GRADO", nullable = false)

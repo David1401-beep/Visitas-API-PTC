@@ -33,6 +33,7 @@ public class EncargadoServiceImpl implements EncargadoService {
     @Transactional
     public EncargadoEntity guardar(EncargadoDTO dto) {
         EncargadoEntity encargado = EncargadoEntity.builder()
+                .idUsuario(dto.getIdUsuario())
                 .nombre(dto.getNombre())
                 .apellido(dto.getApellido())
                 .telefono(dto.getTelefono())
@@ -45,6 +46,7 @@ public class EncargadoServiceImpl implements EncargadoService {
     @Transactional
     public EncargadoEntity actualizar(Long id, EncargadoDTO dto) {
         EncargadoEntity encargado = buscarPorId(id);
+        encargado.setIdUsuario(dto.getIdUsuario());
         encargado.setNombre(dto.getNombre());
         encargado.setApellido(dto.getApellido());
         encargado.setTelefono(dto.getTelefono());
@@ -64,6 +66,9 @@ public class EncargadoServiceImpl implements EncargadoService {
         EncargadoEntity entidadExistente = encargadoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Encargado no encontrado con ID: " + id));
 
+        if (dto.getIdUsuario() != null) {
+            entidadExistente.setIdUsuario(dto.getIdUsuario());
+        }
         if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
             entidadExistente.setNombre(dto.getNombre());
         }
@@ -73,14 +78,19 @@ public class EncargadoServiceImpl implements EncargadoService {
         if (dto.getTelefono() != null && !dto.getTelefono().isBlank()) {
             entidadExistente.setTelefono(dto.getTelefono());
         }
+        if (dto.getCorreo() != null && !dto.getCorreo().isBlank()) {
+            entidadExistente.setCorreo(dto.getCorreo());
+        }
 
         EncargadoEntity actualizado = encargadoRepository.save(entidadExistente);
 
         EncargadoDTO respuestaDTO = new EncargadoDTO();
         respuestaDTO.setIdEncargado(actualizado.getIdEncargado());
+        respuestaDTO.setIdUsuario(actualizado.getIdUsuario());
         respuestaDTO.setNombre(actualizado.getNombre());
         respuestaDTO.setApellido(actualizado.getApellido());
         respuestaDTO.setTelefono(actualizado.getTelefono());
+        respuestaDTO.setCorreo(actualizado.getCorreo());
         return respuestaDTO;
     }
 

@@ -16,6 +16,9 @@ public class EncargadoEntity {
     @Column(name = "ID_ENCARGADO")
     private Long idEncargado;
 
+    @Column(name = "ID_USUARIO", nullable = false, unique = true)
+    private Long idUsuario;
+
     @Column(name = "ENC_NOMBRE", nullable = false, length = 50)
     private String nombre;
 
