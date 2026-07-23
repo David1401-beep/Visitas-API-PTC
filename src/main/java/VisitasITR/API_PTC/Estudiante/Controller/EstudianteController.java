@@ -1,5 +1,7 @@
 package VisitasITR.API_PTC.Estudiante.Controller;
 
+import VisitasITR.API_PTC.Response.ApiResponse;
+
 import VisitasITR.API_PTC.Estudiante.DTO.EstudianteDTO;
 import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import VisitasITR.API_PTC.Estudiante.Services.EstudianteService;
@@ -9,9 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/estudiantes")
@@ -21,138 +21,133 @@ public class EstudianteController {
     private final EstudianteService estudianteService;
 
     @GetMapping
-    public ResponseEntity<?> listar() {
-        Map<String, Object> respuesta = new HashMap<>();
+    public ResponseEntity<ApiResponse<List<EstudianteEntity>>> listar() {
+        ApiResponse<List<EstudianteEntity>> respuesta;
         try {
             List<EstudianteEntity> lista = estudianteService.listarTodos();
 
             if (lista != null && !lista.isEmpty()) {
                 System.out.println("Registros obtenidos con éxito.");
-                respuesta.put("!!", "Lista de estudiantes obtenida exitosamente.");
-                respuesta.put("datos", lista);
+                respuesta = new ApiResponse<>(true, "Lista de estudiantes obtenida exitosamente.", lista);
                 return ResponseEntity.ok(respuesta);
             } else {
                 System.out.println(" No hay datos registrados.");
-                respuesta.put("!!", "No se encontraron estudiantes en la base de datos.");
+                respuesta = new ApiResponse<>(false, "No se encontraron estudiantes en la base de datos.", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
             }
         } catch (Exception e) {
             System.out.println("Error" + e.getMessage());
-            respuesta.put("!!", "Error interno al consultar los estudiantes.");
+            respuesta = new ApiResponse<>(false, "Error interno al consultar los estudiantes.", null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
-        Map<String, Object> respuesta = new HashMap<>();
+    public ResponseEntity<ApiResponse<EstudianteEntity>> obtenerPorId(@PathVariable Long id) {
+        ApiResponse<EstudianteEntity> respuesta;
         try {
             EstudianteEntity dto = estudianteService.buscarPorId(id);
 
             if (dto != null) {
                 System.out.println("id" + id + ": Encontrado.");
-                respuesta.put("!!", "Estudiante encontrado con éxito.");
-                respuesta.put("datos", dto);
+                respuesta = new ApiResponse<>(true, "Estudiante encontrado con éxito.", dto);
                 return ResponseEntity.ok(respuesta);
             } else {
                 System.out.println("ID " + id + ": No encontrado.");
-                respuesta.put("!!", "No se encontró el estudiante con el ID: " + id);
+                respuesta = new ApiResponse<>(false, "No se encontró el estudiante con el ID: " + id, null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
-            respuesta.put("!!", "Error al buscar el registro con ID: " + id);
+            respuesta = new ApiResponse<>(false, "Error al buscar el registro con ID: " + id, null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
         }
     }
 
     @PostMapping
-    public ResponseEntity<?> crear(@Valid @RequestBody EstudianteDTO dto) {
-        Map<String, Object> respuesta = new HashMap<>();
+    public ResponseEntity<ApiResponse<EstudianteEntity>> crear(@Valid @RequestBody EstudianteDTO dto) {
+        ApiResponse<EstudianteEntity> respuesta;
         try {
             EstudianteEntity nuevo = estudianteService.guardar(dto);
 
             if (nuevo != null) {
                 System.out.println("Creado exitosamente.");
-                respuesta.put("!!", "Estudiante registrado con éxito.");
-                respuesta.put("datos", nuevo);
+                respuesta = new ApiResponse<>(true, "Estudiante registrado con éxito.", nuevo);
                 return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
             } else {
                 System.out.println("No se pudo crear.");
-                respuesta.put("!!", "No se pudo registrar el estudiante.");
+                respuesta = new ApiResponse<>(false, "No se pudo registrar el estudiante.", null);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
             }
         } catch (Exception e) {
             System.out.println("ERROR" + e.getMessage());
-            respuesta.put("!!", "Error de datos o de solicitud al crear el registro.");
+            respuesta = new ApiResponse<>(false, "Error de datos o de solicitud al crear el registro.", null);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody EstudianteDTO dto) {
-        Map<String, Object> respuesta = new HashMap<>();
+    public ResponseEntity<ApiResponse<EstudianteEntity>> actualizar(@PathVariable Long id, @Valid @RequestBody EstudianteDTO dto) {
+        ApiResponse<EstudianteEntity> respuesta;
         try {
             EstudianteEntity actualizado = estudianteService.actualizar(id, dto);
 
             if (actualizado != null) {
                 System.out.println("ID " + id + ": Actualizado.");
-                respuesta.put("!!", "Estudiante actualizado completamente.");
-                respuesta.put("datos", actualizado);
+                respuesta = new ApiResponse<>(true, "Estudiante actualizado completamente.", actualizado);
                 return ResponseEntity.ok(respuesta);
             } else {
                 System.out.println(" ID " + id + ": No actualizado.");
-                respuesta.put("!!", "No se pudo actualizar el estudiante.");
+                respuesta = new ApiResponse<>(false, "No se pudo actualizar el estudiante.", null);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
             }
         } catch (Exception e) {
             System.out.println(" ERROR : " + e.getMessage());
-            respuesta.put("!!", "Registro no encontrado para actualizar o datos inválidos.");
+            respuesta = new ApiResponse<>(false, "Registro no encontrado para actualizar o datos inválidos.", null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
         }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> actualizarEstudiante(@PathVariable Long id, @RequestBody EstudianteDTO dto) {
-        Map<String, Object> respuesta = new HashMap<>();
+    public ResponseEntity<ApiResponse<EstudianteDTO>> actualizarEstudiante(@PathVariable Long id, @RequestBody EstudianteDTO dto) {
+        ApiResponse<EstudianteDTO> respuesta;
         try {
             EstudianteDTO actualizado = estudianteService.actualizarEstudiante(id, dto);
 
             if (actualizado != null) {
                 System.out.println("ID " + id + ": Parcialmente actualizado.");
-                respuesta.put("!!", "Estudiante actualizado parcialmente con éxito.");
-                respuesta.put("datos", actualizado);
+                respuesta = new ApiResponse<>(true, "Estudiante actualizado parcialmente con éxito.", actualizado);
                 return ResponseEntity.ok(respuesta);
             } else {
                 System.out.println("ID " + id + ": No se pudo actualizar.");
-                respuesta.put("!!", "No se pudo realizar la actualización parcial.");
+                respuesta = new ApiResponse<>(false, "No se pudo realizar la actualización parcial.", null);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
             }
         } catch (Exception e) {
             System.out.println(" ERROR: " + e.getMessage());
-            respuesta.put("!!", "Ocurrió un error o el ID no existe en el sistema.");
+            respuesta = new ApiResponse<>(false, "Ocurrió un error o el ID no existe en el sistema.", null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminar2(@PathVariable Long id) {
-        Map<String, Object> respuesta = new HashMap<>();
+    public ResponseEntity<ApiResponse<EstudianteDTO>> eliminar2(@PathVariable Long id) {
+        ApiResponse<EstudianteDTO> respuesta;
         try {
             boolean eliminado = estudianteService.eliminar2(id);
 
             if (eliminado) {
                 System.out.println("ID " + id + ": Eliminado correctamente.");
-                respuesta.put("!!", "Estudiante eliminado exitosamente.");
+                respuesta = new ApiResponse<>(true, "Estudiante eliminado exitosamente.", null);
                 return ResponseEntity.ok(respuesta);
             } else {
                 System.out.println("ID" + id + ": Registro no existía.");
-                respuesta.put("!!", "No se encontró el estudiante para eliminar.");
+                respuesta = new ApiResponse<>(false, "No se encontró el estudiante para eliminar.", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
             }
         } catch (Exception e) {
             System.out.println(" ERROR: " + e.getMessage());
-            respuesta.put("!!", "Error al intentar eliminar el estudiante.");
+            respuesta = new ApiResponse<>(false, "Error al intentar eliminar el estudiante.", null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
         }
     }
