@@ -52,4 +52,26 @@ public class EspecialidadServiceImpl implements EspecialidadService {
         EspecialidadEntity especialidad = buscarPorId(id);
         especialidadRepository.delete(especialidad);
     }
+
+    @Override
+    public EspecialidadDTO actualizarEspecialidad(Long id, EspecialidadDTO dto) {
+        EspecialidadEntity entidadExistente = especialidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
+
+        if (dto.getEspecialidad() != null && !dto.getEspecialidad().isBlank()) {
+            entidadExistente.setEspecialidad(dto.getEspecialidad());
+        }
+
+        EspecialidadEntity actualizado = especialidadRepository.save(entidadExistente);
+
+        EspecialidadDTO respuestaDTO = new EspecialidadDTO();
+        respuestaDTO.setIdEspecialidad(actualizado.getIdEspecialidad());
+        respuestaDTO.setEspecialidad(actualizado.getEspecialidad());
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

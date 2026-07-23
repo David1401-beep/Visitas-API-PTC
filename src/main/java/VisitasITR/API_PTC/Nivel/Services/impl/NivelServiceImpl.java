@@ -52,4 +52,26 @@ public class NivelServiceImpl implements NivelService {
         NivelEntity nivel = buscarPorId(id);
         nivelRepository.delete(nivel);
     }
+
+    @Override
+    public NivelDTO actualizarNivel(Long id, NivelDTO dto) {
+        NivelEntity entidadExistente = nivelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nivel no encontrado con ID: " + id));
+
+        if (dto.getNivel() != null && !dto.getNivel().isBlank()) {
+            entidadExistente.setNivel(dto.getNivel());
+        }
+
+        NivelEntity actualizado = nivelRepository.save(entidadExistente);
+
+        NivelDTO respuestaDTO = new NivelDTO();
+        respuestaDTO.setIdNivel(actualizado.getIdNivel());
+        respuestaDTO.setNivel(actualizado.getNivel());
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

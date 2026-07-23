@@ -54,4 +54,30 @@ public class DocenteServiceImpl implements DocenteService {
         DocenteEntity docente = buscarPorId(id);
         docenteRepository.delete(docente);
     }
+
+    @Override
+    public DocenteDTO actualizarDocente(Long id, DocenteDTO dto) {
+        DocenteEntity entidadExistente = docenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Docente no encontrado con ID: " + id));
+
+        if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
+            entidadExistente.setNombre(dto.getNombre());
+        }
+        if (dto.getApellido() != null && !dto.getApellido().isBlank()) {
+            entidadExistente.setApellido(dto.getApellido());
+        }
+
+        DocenteEntity actualizado = docenteRepository.save(entidadExistente);
+
+        DocenteDTO respuestaDTO = new DocenteDTO();
+        respuestaDTO.setIdDocente(actualizado.getIdDocente());
+        respuestaDTO.setNombre(actualizado.getNombre());
+        respuestaDTO.setApellido(actualizado.getApellido());
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

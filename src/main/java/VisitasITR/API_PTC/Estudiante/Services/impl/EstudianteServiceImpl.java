@@ -70,4 +70,34 @@ public class EstudianteServiceImpl implements EstudianteService {
         EstudianteEntity estudiante = buscarPorId(id);
         estudianteRepository.delete(estudiante);
     }
+
+    @Override
+    public EstudianteDTO actualizarEstudiante(Long id, EstudianteDTO dto) {
+        EstudianteEntity entidadExistente = estudianteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con ID: " + id));
+
+        if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
+            entidadExistente.setNombre(dto.getNombre());
+        }
+        if (dto.getApellido() != null && !dto.getApellido().isBlank()) {
+            entidadExistente.setApellido(dto.getApellido());
+        }
+        if (dto.getNie() != null && !dto.getNie().isBlank()) {
+            entidadExistente.setNie(dto.getNie());
+        }
+
+        EstudianteEntity actualizado = estudianteRepository.save(entidadExistente);
+
+        EstudianteDTO respuestaDTO = new EstudianteDTO();
+        respuestaDTO.setIdEstudiante(actualizado.getIdEstudiante());
+        respuestaDTO.setNombre(actualizado.getNombre());
+        respuestaDTO.setApellido(actualizado.getApellido());
+        respuestaDTO.setNie(actualizado.getNie());
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

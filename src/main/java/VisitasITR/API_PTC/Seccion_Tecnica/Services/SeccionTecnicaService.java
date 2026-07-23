@@ -15,4 +15,8 @@ public interface SeccionTecnicaService {
     SeccionTecnicaEntity actualizar(Long id, SeccionTecnicaDTO dto);
 
     void eliminar(Long id);
+
+    SeccionTecnicaDTO actualizarSeccionTecnica(Long id, SeccionTecnicaDTO dto);
+
+    boolean eliminar2(Long id);
 }

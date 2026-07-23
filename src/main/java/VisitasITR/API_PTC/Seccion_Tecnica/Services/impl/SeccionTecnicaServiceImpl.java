@@ -51,4 +51,26 @@ public class SeccionTecnicaServiceImpl implements SeccionTecnicaService {
         SeccionTecnicaEntity tecnica = buscarPorId(id);
         seccionTecnicaRepository.delete(tecnica);
     }
+
+    @Override
+    public SeccionTecnicaDTO actualizarSeccionTecnica(Long id, SeccionTecnicaDTO dto) {
+        SeccionTecnicaEntity entidadExistente = seccionTecnicaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("SeccionTecnica no encontrada con ID: " + id));
+
+        if (dto.getTecnica() != null && !dto.getTecnica().isBlank()) {
+            entidadExistente.setTecnica(dto.getTecnica());
+        }
+
+        SeccionTecnicaEntity actualizado = seccionTecnicaRepository.save(entidadExistente);
+
+        SeccionTecnicaDTO respuestaDTO = new SeccionTecnicaDTO();
+        respuestaDTO.setIdTecnica(actualizado.getIdTecnica());
+        respuestaDTO.setTecnica(actualizado.getTecnica());
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

@@ -58,4 +58,34 @@ public class EncargadoServiceImpl implements EncargadoService {
         EncargadoEntity encargado = buscarPorId(id);
         encargadoRepository.delete(encargado);
     }
+
+    @Override
+    public EncargadoDTO actualizarEncargado(Long id, EncargadoDTO dto) {
+        EncargadoEntity entidadExistente = encargadoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Encargado no encontrado con ID: " + id));
+
+        if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
+            entidadExistente.setNombre(dto.getNombre());
+        }
+        if (dto.getApellido() != null && !dto.getApellido().isBlank()) {
+            entidadExistente.setApellido(dto.getApellido());
+        }
+        if (dto.getTelefono() != null && !dto.getTelefono().isBlank()) {
+            entidadExistente.setTelefono(dto.getTelefono());
+        }
+
+        EncargadoEntity actualizado = encargadoRepository.save(entidadExistente);
+
+        EncargadoDTO respuestaDTO = new EncargadoDTO();
+        respuestaDTO.setIdEncargado(actualizado.getIdEncargado());
+        respuestaDTO.setNombre(actualizado.getNombre());
+        respuestaDTO.setApellido(actualizado.getApellido());
+        respuestaDTO.setTelefono(actualizado.getTelefono());
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

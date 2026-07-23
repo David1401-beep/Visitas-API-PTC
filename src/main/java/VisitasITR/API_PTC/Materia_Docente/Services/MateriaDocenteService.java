@@ -15,4 +15,8 @@ public interface MateriaDocenteService {
     MateriaDocenteEntity actualizar(Long id, MateriaDocenteDTO dto);
 
     void eliminar(Long id);
+
+    MateriaDocenteDTO actualizarMateriaDocente(Long id, MateriaDocenteDTO dto);
+
+    boolean eliminar2(Long id);
 }

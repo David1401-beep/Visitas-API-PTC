@@ -75,4 +75,38 @@ public class DocenteGradoServiceImpl implements DocenteGradoService {
         DocenteGradoEntity relacion = buscarPorId(id);
         docenteGradoRepository.delete(relacion);
     }
+
+    @Override
+    public DocenteGradoDTO actualizarDocenteGrado(Long id, DocenteGradoDTO dto) {
+        DocenteGradoEntity entidadExistente = docenteGradoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("DocenteGrado no encontrado con ID: " + id));
+
+        if (dto.getIdDocente() != null) {
+            DocenteEntity docente = docenteRepository.findById(dto.getIdDocente())
+                    .orElseThrow(() -> new RuntimeException("Docente no encontrado con ID: " + dto.getIdDocente()));
+            entidadExistente.setDocente(docente);
+        }
+        if (dto.getIdGrado() != null) {
+            GradoEntity grado = gradoRepository.findById(dto.getIdGrado())
+                    .orElseThrow(() -> new RuntimeException("Grado no encontrado con ID: " + dto.getIdGrado()));
+            entidadExistente.setGrado(grado);
+        }
+
+        DocenteGradoEntity actualizado = docenteGradoRepository.save(entidadExistente);
+
+        DocenteGradoDTO respuestaDTO = new DocenteGradoDTO();
+        respuestaDTO.setIdDocenteGrado(actualizado.getIdDocenteGrado());
+        if (actualizado.getDocente() != null) {
+            respuestaDTO.setIdDocente(actualizado.getDocente().getIdDocente());
+        }
+        if (actualizado.getGrado() != null) {
+            respuestaDTO.setIdGrado(actualizado.getGrado().getIdGrado());
+        }
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

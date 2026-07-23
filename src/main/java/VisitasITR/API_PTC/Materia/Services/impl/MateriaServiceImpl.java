@@ -54,4 +54,26 @@ public class MateriaServiceImpl implements MateriaService {
         MateriaEntity materia = buscarPorId(id);
         materiaRepository.delete(materia);
     }
+
+    @Override
+    public MateriaDTO actualizarMateria(Long id, MateriaDTO dto) {
+        MateriaEntity entidadExistente = materiaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Materia no encontrada con ID: " + id));
+
+        if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
+            entidadExistente.setNombre(dto.getNombre());
+        }
+
+        MateriaEntity actualizado = materiaRepository.save(entidadExistente);
+
+        MateriaDTO respuestaDTO = new MateriaDTO();
+        respuestaDTO.setIdMateria(actualizado.getIdMateria());
+        respuestaDTO.setNombre(actualizado.getNombre());
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

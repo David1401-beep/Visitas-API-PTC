@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/grados")
@@ -19,47 +21,139 @@ public class GradoController {
     private final GradoService gradoService;
 
     @GetMapping
-    public ResponseEntity<List<GradoEntity>> listar() {
-        return ResponseEntity.ok(gradoService.listarTodos());
+    public ResponseEntity<?> listar() {
+        Map<String, Object> respuesta = new HashMap<>();
+        try {
+            List<GradoEntity> lista = gradoService.listarTodos();
+
+            if (lista != null && !lista.isEmpty()) {
+                System.out.println("Registros obtenidos con éxito.");
+                respuesta.put("!!", "Lista de grados obtenida exitosamente.");
+                respuesta.put("datos", lista);
+                return ResponseEntity.ok(respuesta);
+            } else {
+                System.out.println(" No hay datos registrados.");
+                respuesta.put("!!", "No se encontraron grados en la base de datos.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+            }
+        } catch (Exception e) {
+            System.out.println("Error" + e.getMessage());
+            respuesta.put("!!", "Error interno al consultar los grados.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GradoEntity> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
+        Map<String, Object> respuesta = new HashMap<>();
         try {
-            return ResponseEntity.ok(gradoService.buscarPorId(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            GradoEntity dto = gradoService.buscarPorId(id);
+
+            if (dto != null) {
+                System.out.println("id" + id + ": Encontrado.");
+                respuesta.put("!!", "Grado encontrado con éxito.");
+                respuesta.put("datos", dto);
+                return ResponseEntity.ok(respuesta);
+            } else {
+                System.out.println("ID " + id + ": No encontrado.");
+                respuesta.put("!!", "No se encontró el grado con el ID: " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            respuesta.put("!!", "Error al buscar el registro con ID: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
         }
     }
 
     @PostMapping
-    public ResponseEntity<GradoEntity> crear(@Valid @RequestBody GradoDTO dto) {
+    public ResponseEntity<?> crear(@Valid @RequestBody GradoDTO dto) {
+        Map<String, Object> respuesta = new HashMap<>();
         try {
             GradoEntity nuevo = gradoService.guardar(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
+
+            if (nuevo != null) {
+                System.out.println("Creado exitosamente.");
+                respuesta.put("!!", "Grado registrado con éxito.");
+                respuesta.put("datos", nuevo);
+                return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+            } else {
+                System.out.println("No se pudo crear.");
+                respuesta.put("!!", "No se pudo registrar el grado.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            System.out.println("ERROR" + e.getMessage());
+            respuesta.put("!!", "Error de datos o de solicitud al crear el registro.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GradoEntity> actualizar(@PathVariable Long id, @Valid @RequestBody GradoDTO dto) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody GradoDTO dto) {
+        Map<String, Object> respuesta = new HashMap<>();
         try {
-            return ResponseEntity.ok(gradoService.actualizar(id, dto));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            GradoEntity actualizado = gradoService.actualizar(id, dto);
+
+            if (actualizado != null) {
+                System.out.println("ID " + id + ": Actualizado.");
+                respuesta.put("!!", "Grado actualizado completamente.");
+                respuesta.put("datos", actualizado);
+                return ResponseEntity.ok(respuesta);
+            } else {
+                System.out.println(" ID " + id + ": No actualizado.");
+                respuesta.put("!!", "No se pudo actualizar el grado.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            System.out.println(" ERROR : " + e.getMessage());
+            respuesta.put("!!", "Registro no encontrado para actualizar o datos inválidos.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+        }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> actualizarGrado(@PathVariable Long id, @RequestBody GradoDTO dto) {
+        Map<String, Object> respuesta = new HashMap<>();
+        try {
+            GradoDTO actualizado = gradoService.actualizarGrado(id, dto);
+
+            if (actualizado != null) {
+                System.out.println("ID " + id + ": Parcialmente actualizado.");
+                respuesta.put("!!", "Grado actualizado parcialmente con éxito.");
+                respuesta.put("datos", actualizado);
+                return ResponseEntity.ok(respuesta);
+            } else {
+                System.out.println("ID " + id + ": No se pudo actualizar.");
+                respuesta.put("!!", "No se pudo realizar la actualización parcial.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
+            }
+        } catch (Exception e) {
+            System.out.println(" ERROR: " + e.getMessage());
+            respuesta.put("!!", "Ocurrió un error o el ID no existe en el sistema.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public ResponseEntity<?> eliminar2(@PathVariable Long id) {
+        Map<String, Object> respuesta = new HashMap<>();
         try {
-            gradoService.eliminar(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            boolean eliminado = gradoService.eliminar2(id);
+
+            if (eliminado) {
+                System.out.println("ID " + id + ": Eliminado correctamente.");
+                respuesta.put("!!", "Grado eliminado exitosamente.");
+                return ResponseEntity.ok(respuesta);
+            } else {
+                System.out.println("ID" + id + ": Registro no existía.");
+                respuesta.put("!!", "No se encontró el grado para eliminar.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+            }
+        } catch (Exception e) {
+            System.out.println(" ERROR: " + e.getMessage());
+            respuesta.put("!!", "Error al intentar eliminar el grado.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
         }
     }
 }

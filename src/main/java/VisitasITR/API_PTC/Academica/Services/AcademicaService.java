@@ -1,18 +1,21 @@
 package VisitasITR.API_PTC.Academica.Services;
 
 import VisitasITR.API_PTC.Academica.DTO.AcademicaDTO;
-import VisitasITR.API_PTC.Academica.Entity.AcademicaEntity;
-
 import java.util.List;
 
 public interface AcademicaService {
-    List<AcademicaEntity> listarTodos();
 
-    AcademicaEntity buscarPorId(Long id);
+    List<AcademicaDTO> listarTodos();
 
-    AcademicaEntity guardar(AcademicaDTO dto);
+    AcademicaDTO buscarPorId(Long id);
 
-    AcademicaEntity actualizar(Long id, AcademicaDTO dto);
+    AcademicaDTO guardar(AcademicaDTO dto);
+
+    AcademicaDTO actualizar(Long id, AcademicaDTO dto); // PUT
+
+    AcademicaDTO actualizarAcademica(Long id, AcademicaDTO dto); // PATCH
 
     void eliminar(Long id);
+
+    boolean eliminar2(Long id);
 }

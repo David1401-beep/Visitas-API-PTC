@@ -15,4 +15,8 @@ public interface EstudianteService {
     EstudianteEntity actualizar(Long id, EstudianteDTO dto);
 
     void eliminar(Long id);
+
+    EstudianteDTO actualizarEstudiante(Long id, EstudianteDTO dto);
+
+    boolean eliminar2(Long id);
 }

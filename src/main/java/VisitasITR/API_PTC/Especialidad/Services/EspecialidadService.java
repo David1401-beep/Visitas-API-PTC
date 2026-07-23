@@ -15,4 +15,8 @@ public interface EspecialidadService {
     EspecialidadEntity actualizar(Long id, EspecialidadDTO dto);
 
     void eliminar(Long id);
+
+    EspecialidadDTO actualizarEspecialidad(Long id, EspecialidadDTO dto);
+
+    boolean eliminar2(Long id);
 }

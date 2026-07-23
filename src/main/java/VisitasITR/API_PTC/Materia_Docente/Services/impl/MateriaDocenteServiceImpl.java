@@ -75,4 +75,38 @@ public class MateriaDocenteServiceImpl implements MateriaDocenteService {
         MateriaDocenteEntity relacion = buscarPorId(id);
         materiaDocenteRepository.delete(relacion);
     }
+
+    @Override
+    public MateriaDocenteDTO actualizarMateriaDocente(Long id, MateriaDocenteDTO dto) {
+        MateriaDocenteEntity entidadExistente = materiaDocenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("MateriaDocente no encontrada con ID: " + id));
+
+        if (dto.getIdMateria() != null) {
+            MateriaEntity materia = materiaRepository.findById(dto.getIdMateria())
+                    .orElseThrow(() -> new RuntimeException("Materia no encontrada con ID: " + dto.getIdMateria()));
+            entidadExistente.setMateria(materia);
+        }
+        if (dto.getIdDocente() != null) {
+            DocenteEntity docente = docenteRepository.findById(dto.getIdDocente())
+                    .orElseThrow(() -> new RuntimeException("Docente no encontrado con ID: " + dto.getIdDocente()));
+            entidadExistente.setDocente(docente);
+        }
+
+        MateriaDocenteEntity actualizado = materiaDocenteRepository.save(entidadExistente);
+
+        MateriaDocenteDTO respuestaDTO = new MateriaDocenteDTO();
+        respuestaDTO.setIdMateriaDocente(actualizado.getIdMateriaDocente());
+        if (actualizado.getMateria() != null) {
+            respuestaDTO.setIdMateria(actualizado.getMateria().getIdMateria());
+        }
+        if (actualizado.getDocente() != null) {
+            respuestaDTO.setIdDocente(actualizado.getDocente().getIdDocente());
+        }
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

@@ -85,4 +85,26 @@ public class GradoServiceImpl implements GradoService {
         GradoEntity grado = buscarPorId(id);
         gradoRepository.delete(grado);
     }
+
+    @Override
+    public GradoDTO actualizarGrado(Long id, GradoDTO dto) {
+        GradoEntity entidadExistente = gradoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Grado no encontrado con ID: " + id));
+
+        if (dto.getGrado() != null && !dto.getGrado().isBlank()) {
+            entidadExistente.setGrado(dto.getGrado());
+        }
+
+        GradoEntity actualizado = gradoRepository.save(entidadExistente);
+
+        GradoDTO respuestaDTO = new GradoDTO();
+        respuestaDTO.setIdGrado(actualizado.getIdGrado());
+        respuestaDTO.setGrado(actualizado.getGrado());
+        return respuestaDTO;
+    }
+
+    @Override
+    public boolean eliminar2(Long id) {
+        return false;
+    }
 }

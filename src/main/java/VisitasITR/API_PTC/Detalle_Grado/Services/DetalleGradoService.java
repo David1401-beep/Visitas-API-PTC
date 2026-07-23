@@ -15,5 +15,9 @@ public interface DetalleGradoService {
     DetalleGradoEntity actualizar(Long id, DetalleGradoDTO dto);
 
     void eliminar(Long id);
+
+    DetalleGradoDTO actualizarDetalleGrado(Long id, DetalleGradoDTO dto);
+
+    boolean eliminar2(Long id);
 }
 

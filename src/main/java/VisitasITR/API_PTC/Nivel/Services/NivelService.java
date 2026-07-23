@@ -15,4 +15,8 @@ public interface NivelService {
     NivelEntity actualizar(Long id, NivelDTO dto);
 
     void eliminar(Long id);
+
+    NivelDTO actualizarNivel(Long id, NivelDTO dto);
+
+    boolean eliminar2(Long id);
 }

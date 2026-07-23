@@ -1,4 +1,4 @@
-package VisitasITR.API_PTC.Academica.Reposity;
+package VisitasITR.API_PTC.Academica.Repository;
 
 import VisitasITR.API_PTC.Academica.Entity.AcademicaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

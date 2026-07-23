@@ -15,4 +15,9 @@ public interface EncargadoService {
     EncargadoEntity actualizar(Long id, EncargadoDTO dto);
 
     void eliminar(Long id);
+
+    EncargadoDTO actualizarEncargado(Long id, EncargadoDTO dto);
+
+    boolean eliminar2(Long id);
+
 }
