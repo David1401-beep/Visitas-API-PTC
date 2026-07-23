@@ -12,10 +12,10 @@ import lombok.*;
 public class EstudianteDTO {
 
     private Long idEstudiante;
-
-    @NotBlank(message = "El NIE del estudiante es obligatorio")
-    @Size(max = 15, message = "El NIE no puede exceder los 15 caracteres")
-    private String nie;
+//
+//    @NotBlank(message = "El NIE del estudiante es obligatorio")
+//    @Size(max = 15, message = "El NIE no puede exceder los 15 caracteres")
+//    private String nie;
 
     @NotBlank(message = "El nombre del estudiante es obligatorio")
     @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")

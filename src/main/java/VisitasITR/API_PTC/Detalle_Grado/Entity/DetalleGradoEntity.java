@@ -24,6 +24,6 @@ public class DetalleGradoEntity {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_ACADEMICA", nullable = false)
+    @JoinColumn(name = "ID_ACADEMICA", referencedColumnName = "ID_ACADEMICA")
     private AcademicaEntity academica;
 }

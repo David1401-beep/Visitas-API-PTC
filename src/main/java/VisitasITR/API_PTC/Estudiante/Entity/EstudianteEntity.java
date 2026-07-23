@@ -17,9 +17,9 @@ public class EstudianteEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ESTUDIANTE")
     private Long idEstudiante;
-
-    @Column(name = "EST_NIE", nullable = false, length = 15)
-    private String nie;
+//
+//    @Column(name = "EST_NIE", nullable = false, length = 15)
+//    private String nie;
 
     @Column(name = "EST_NOMBRE", nullable = false, length = 50)
     private String nombre;
@@ -39,11 +39,11 @@ public class EstudianteEntity {
     @Column(name = "EST_CODIGO", length = 20)
     private String codigo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_ACADEMICA", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ID_ACADEMICA", referencedColumnName = "")
     private AcademicaEntity academica;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_DETALLE_GRADO", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ID_DETALLE_GRADO",referencedColumnName = "ID_DETALLE_GRADO")
     private DetalleGradoEntity detalleGrado;
 }

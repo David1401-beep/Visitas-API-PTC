@@ -1,9 +1,13 @@
 package VisitasITR.API_PTC.Academica.Entity;
 
+import VisitasITR.API_PTC.Detalle_Grado.Entity.DetalleGradoEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "ACADEMICA")
@@ -19,4 +23,7 @@ public class AcademicaEntity {
 
     @Column(name = "Academica")
     private String seccion;
+
+    @OneToMany(mappedBy = "academica", fetch = FetchType.LAZY)
+    List<DetalleGradoEntity> listaGrado = new ArrayList<>();
 }

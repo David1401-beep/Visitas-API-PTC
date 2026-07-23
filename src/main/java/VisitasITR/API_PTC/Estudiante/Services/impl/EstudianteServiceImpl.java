@@ -45,7 +45,7 @@ public class EstudianteServiceImpl implements EstudianteService {
                 .orElseThrow(() -> new RuntimeException("Sección académica asociada no encontrada"));
 
         EstudianteEntity estudiante = EstudianteEntity.builder()
-                .nie(dto.getNie())
+//                .nie(dto.getNie())
                 .nombre(dto.getNombre())
                 .apellido(dto.getApellido())
                 .grado(dto.getGrado())
@@ -55,7 +55,6 @@ public class EstudianteServiceImpl implements EstudianteService {
                 .academica(academica)
                 .detalleGrado(detalleGrado)
                 .build();
-
         return estudianteRepository.save(estudiante);
     }
 
@@ -70,7 +69,7 @@ public class EstudianteServiceImpl implements EstudianteService {
         AcademicaEntity academica = academicaRepository.findById(dto.getIdAcademica())
                 .orElseThrow(() -> new RuntimeException("Sección académica asociada no encontrada"));
 
-        estudiante.setNie(dto.getNie());
+//        estudiante.setNie(dto.getNie());
         estudiante.setNombre(dto.getNombre());
         estudiante.setApellido(dto.getApellido());
         estudiante.setGrado(dto.getGrado());
@@ -101,9 +100,9 @@ public class EstudianteServiceImpl implements EstudianteService {
         if (dto.getApellido() != null && !dto.getApellido().isBlank()) {
             entidadExistente.setApellido(dto.getApellido());
         }
-        if (dto.getNie() != null && !dto.getNie().isBlank()) {
-            entidadExistente.setNie(dto.getNie());
-        }
+//        if (dto.getNie() != null && !dto.getNie().isBlank()) {
+//            entidadExistente.setNie(dto.getNie());
+//        }
         if (dto.getGrado() != null && !dto.getGrado().isBlank()) {
             entidadExistente.setGrado(dto.getGrado());
         }
@@ -133,7 +132,7 @@ public class EstudianteServiceImpl implements EstudianteService {
         respuestaDTO.setIdEstudiante(actualizado.getIdEstudiante());
         respuestaDTO.setNombre(actualizado.getNombre());
         respuestaDTO.setApellido(actualizado.getApellido());
-        respuestaDTO.setNie(actualizado.getNie());
+//        respuestaDTO.setNie(actualizado.getNie());
         respuestaDTO.setGrado(actualizado.getGrado());
         respuestaDTO.setSeccion(actualizado.getSeccion());
         respuestaDTO.setEspecialidad(actualizado.getEspecialidad());
