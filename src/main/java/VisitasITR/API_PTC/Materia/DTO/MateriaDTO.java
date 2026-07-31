@@ -1,6 +1,7 @@
 package VisitasITR.API_PTC.Materia.DTO;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -18,5 +19,6 @@ public class MateriaDTO {
 
     @NotBlank(message = "El tipo de materia es obligatorio (ej. Técnica o Académica)")
     @Size(max = 20, message = "El tipo no puede exceder los 20 caracteres")
+    @Pattern(regexp = "TECNICA|ACADEMICA", message = "El tipo debe ser TECNICA o ACADEMICA")
     private String tipo;
 }

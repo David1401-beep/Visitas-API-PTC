@@ -12,34 +12,31 @@ import lombok.*;
 public class EstudianteDTO {
 
     private Long idEstudiante;
-//
-//    @NotBlank(message = "El NIE del estudiante es obligatorio")
-//    @Size(max = 15, message = "El NIE no puede exceder los 15 caracteres")
-//    private String nie;
 
     @NotBlank(message = "El nombre del estudiante es obligatorio")
-    @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")
+    @Size(max = 60, message = "El nombre no puede exceder los 60 caracteres")
     private String nombre;
 
     @NotBlank(message = "El apellido del estudiante es obligatorio")
-    @Size(max = 50, message = "El apellido no puede exceder los 50 caracteres")
+    @Size(max = 60, message = "El apellido no puede exceder los 60 caracteres")
     private String apellido;
 
-    @Size(max = 30, message = "El grado no puede exceder los 30 caracteres")
+    @Size(max = 40, message = "El grado no puede exceder los 40 caracteres")
     private String grado;
 
-    @Size(max = 10, message = "La sección no puede exceder los 10 caracteres")
+    @Size(max = 20, message = "La sección no puede exceder los 20 caracteres")
     private String seccion;
 
     @Size(max = 60, message = "La especialidad no puede exceder los 60 caracteres")
     private String especialidad;
 
+    @NotBlank(message = "El código del estudiante es obligatorio")
     @Size(max = 20, message = "El código no puede exceder los 20 caracteres")
     private String codigo;
 
-    @NotNull(message = "El ID de Académica es obligatorio")
+    @NotNull(message = "El ID de la sección académica es obligatorio")
     private Long idAcademica;
 
-    @NotNull(message = "El ID de Detalle Grado es obligatorio")
-    private Long idDetalleGrado;
+    @NotNull(message = "El ID del grado es obligatorio")
+    private Long idGrado;
 }

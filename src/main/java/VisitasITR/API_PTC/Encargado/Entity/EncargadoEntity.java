@@ -4,7 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "ENCARGADO")
+@Table(
+        name = "ENCARGADO",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "ENCARGADO_USUARIO_UQ", columnNames = "ID_USUARIO"),
+                @UniqueConstraint(name = "ENCARGADO_TELEFONO_UQ", columnNames = "ENC_TELEFONO")
+        }
+)
 @Data
 @Builder
 @NoArgsConstructor
@@ -13,8 +19,8 @@ public class EncargadoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_ENCARGADO")
-    private Long idEncargado;
+    @Column(name = "ID_PADRE")
+    private Long idPadre;
 
     @Column(name = "ID_USUARIO", nullable = false, unique = true)
     private Long idUsuario;
@@ -25,9 +31,6 @@ public class EncargadoEntity {
     @Column(name = "ENC_APELLIDO", nullable = false, length = 50)
     private String apellido;
 
-    @Column(name = "ENC_TELEFONO", length = 9)
+    @Column(name = "ENC_TELEFONO", length = 20)
     private String telefono;
-
-    @Column(name = "ENC_CORREO", length = 50)
-    private String correo;
 }

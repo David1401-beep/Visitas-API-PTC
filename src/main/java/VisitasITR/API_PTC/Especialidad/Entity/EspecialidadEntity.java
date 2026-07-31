@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "ESPECIALIDAD")
+@Table(
+        name = "ESPECIALIDAD",
+        uniqueConstraints = @UniqueConstraint(name = "ESPECIALIDAD_NOMBRE_UQ", columnNames = "ESPECIALIDAD")
+)
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,6 +19,6 @@ public class EspecialidadEntity {
     @Column(name = "ID_ESPECIALIDAD")
     private Long idEspecialidad;
 
-    @Column(name = "ESPECIALIDAD", nullable = false, length = 40)
+    @Column(name = "ESPECIALIDAD", nullable = false, length = 60)
     private String especialidad;
 }

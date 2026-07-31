@@ -14,7 +14,7 @@ public class GradoDTO {
     private Long idGrado;
 
     @NotBlank(message = "El nombre del grado es obligatorio")
-    @Size(max = 20, message = "El grado no puede superar los 20 caracteres")
+    @Size(max = 40, message = "El grado no puede superar los 40 caracteres")
     private String grado;
 
     @NotNull(message = "El ID de Nivel es obligatorio")

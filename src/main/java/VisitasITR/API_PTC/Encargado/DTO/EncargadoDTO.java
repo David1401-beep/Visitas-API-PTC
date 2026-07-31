@@ -1,8 +1,8 @@
 package VisitasITR.API_PTC.Encargado.DTO;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 public class EncargadoDTO {
 
-    private Long idEncargado;
+    private Long idPadre;
 
     @NotNull(message = "El ID de usuario es obligatorio")
     private Long idUsuario;
@@ -25,11 +25,7 @@ public class EncargadoDTO {
     @Size(max = 50, message = "El apellido no puede exceder los 50 caracteres")
     private String apellido;
 
-    @Size(max = 9, message = "El teléfono no puede exceder los 9 caracteres")
+    @Size(max = 20, message = "El teléfono no puede exceder los 20 caracteres")
+    @Pattern(regexp = "^$|^[0-9]{4}-[0-9]{4}$", message = "El teléfono debe tener el formato 0000-0000")
     private String telefono;
-
-    @Email(message = "El formato del correo electrónico no es válido")
-    @Size(max = 50, message = "El correo no puede exceder los 50 caracteres")
-    private String correo;
 }
-

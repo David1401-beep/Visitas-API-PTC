@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "DOCENTE")
+@Table(
+        name = "DOCENTE",
+        uniqueConstraints = @UniqueConstraint(name = "DOCENTE_CORREO_UQ", columnNames = "DOC_CORREO")
+)
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,7 +25,7 @@ public class DocenteEntity {
     @Column(name = "DOC_APELLIDO", nullable = false, length = 50)
     private String apellido;
 
-    @Column(name = "DOC_CLAVE", nullable = false, length = 10)
+    @Column(name = "DOC_CLAVE", nullable = false, length = 20)
     private String clave;
 
     @Column(name = "DOC_CORREO", nullable = false, unique = true, length = 100)

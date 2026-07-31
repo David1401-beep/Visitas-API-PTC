@@ -2,6 +2,7 @@ package VisitasITR.API_PTC.Docente.DTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -22,7 +23,7 @@ public class DocenteDTO {
     private String apellido;
 
     @NotBlank(message = "La clave del docente es obligatoria")
-    @Size(max = 10, message = "La clave no puede superar los 10 caracteres")
+    @Size(max = 20, message = "La clave no puede superar los 20 caracteres")
     private String clave;
 
     @NotBlank(message = "El correo del docente es obligatorio")
@@ -35,5 +36,6 @@ public class DocenteDTO {
     private String rol;
 
     @Size(max = 20, message = "El tipo de docente no puede superar los 20 caracteres")
+    @Pattern(regexp = "ACADEMICO|TECNICO", message = "El tipo de docente debe ser ACADEMICO o TECNICO")
     private String tipo;
 }

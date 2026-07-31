@@ -19,18 +19,18 @@ public class GradoEntity {
     @Column(name = "ID_GRADO")
     private Long idGrado;
 
-    @Column(name = "GRADO", nullable = false, length = 20)
+    @Column(name = "GRADO", nullable = false, length = 40)
     private String grado;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ID_NIVEL", nullable = false)
     private NivelEntity nivel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_TECNICA")
     private SeccionTecnicaEntity seccionTecnica;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_ESPECIALIDAD")
     private EspecialidadEntity especialidad;
 }

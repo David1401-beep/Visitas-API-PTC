@@ -13,6 +13,6 @@ public class NivelDTO {
     private Long idNivel;
 
     @NotBlank(message = "El nombre del nivel es obligatorio")
-    @Size(max = 20, message = "El nombre del nivel no puede superar los 20 caracteres")
+    @Size(max = 40, message = "El nombre del nivel no puede superar los 40 caracteres")
     private String nivel;
 }

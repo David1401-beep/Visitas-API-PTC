@@ -1,29 +1,22 @@
 package VisitasITR.API_PTC.Academica.Entity;
 
-import VisitasITR.API_PTC.Detalle_Grado.Entity.DetalleGradoEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.*;
 
 @Entity
-@Table(name = "ACADEMICA")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "ACADEMICA", uniqueConstraints = @UniqueConstraint(name = "ACADEMICA_NOMBRE_UQ", columnNames = "ACADEMICA"))
+
 public class AcademicaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_Academica")
+    @Column(name = "ID_ACADEMICA")
     private Long idAcademica;
 
-    @Column(name = "Academica")
+    @Column(name = "ACADEMICA", nullable = false, length = 60)
     private String seccion;
-
-    @OneToMany(mappedBy = "academica", fetch = FetchType.LAZY)
-    List<DetalleGradoEntity> listaGrado = new ArrayList<>();
 }
