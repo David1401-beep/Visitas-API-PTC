@@ -6,61 +6,71 @@ import VisitasITR.API_PTC.Seccion_Tecnica.Reposity.SeccionTecnicaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SeccionTecnicaService {
 
     private final SeccionTecnicaRepository seccionTecnicaRepository;
-    @Transactional(readOnly = true)
-    public List<SeccionTecnicaEntity> listarTodos() {
-        return seccionTecnicaRepository.findAll();
+
+    public List<SeccionTecnicaDTO> listarTodos() {
+        return seccionTecnicaRepository.findAll()
+                .stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
-    @Transactional(readOnly = true)
-    public SeccionTecnicaEntity buscarPorId(Long id) {
-        return seccionTecnicaRepository.findById(id)
+
+    public SeccionTecnicaDTO buscarPorId(Long id) {
+        SeccionTecnicaEntity tecnica = seccionTecnicaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sección técnica no encontrada con ID: " + id));
+        return convertirADto(tecnica);
     }
+
     @Transactional
-    public SeccionTecnicaEntity guardar(SeccionTecnicaDTO dto) {
+    public SeccionTecnicaDTO guardar(SeccionTecnicaDTO dto) {
         SeccionTecnicaEntity tecnica = SeccionTecnicaEntity.builder()
                 .tecnica(dto.getTecnica())
                 .build();
-        return seccionTecnicaRepository.save(tecnica);
+        return convertirADto(seccionTecnicaRepository.save(tecnica));
     }
+
     @Transactional
-    public SeccionTecnicaEntity actualizar(Long id, SeccionTecnicaDTO dto) {
-        SeccionTecnicaEntity tecnica = buscarPorId(id);
+    public SeccionTecnicaDTO actualizar(Long id, SeccionTecnicaDTO dto) {
+        SeccionTecnicaEntity tecnica = seccionTecnicaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sección técnica no encontrada con ID: " + id));
+
         tecnica.setTecnica(dto.getTecnica());
-        return seccionTecnicaRepository.save(tecnica);
+        return convertirADto(seccionTecnicaRepository.save(tecnica));
     }
+
     @Transactional
-    public void eliminar(Long id) {
-        SeccionTecnicaEntity tecnica = buscarPorId(id);
-        seccionTecnicaRepository.delete(tecnica);
-    }
-    public SeccionTecnicaDTO actualizarSeccionTecnica(Long id, SeccionTecnicaDTO dto) {
+    public SeccionTecnicaDTO actualizarParcial(Long id, SeccionTecnicaDTO dto) {
         SeccionTecnicaEntity entidadExistente = seccionTecnicaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("SeccionTecnica no encontrada con ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Sección técnica no encontrada con ID: " + id));
 
         if (dto.getTecnica() != null && !dto.getTecnica().isBlank()) {
             entidadExistente.setTecnica(dto.getTecnica());
         }
 
-        SeccionTecnicaEntity actualizado = seccionTecnicaRepository.save(entidadExistente);
-
-        SeccionTecnicaDTO respuestaDTO = new SeccionTecnicaDTO();
-        respuestaDTO.setIdTecnica(actualizado.getIdTecnica());
-        respuestaDTO.setTecnica(actualizado.getTecnica());
-        return respuestaDTO;
+        return convertirADto(seccionTecnicaRepository.save(entidadExistente));
     }
+
     @Transactional
-    public boolean eliminar2(Long id) {
-        if (seccionTecnicaRepository.existsById(id)) {
-            seccionTecnicaRepository.deleteById(id);
-            return true;
+    public void eliminar(Long id) {
+        if (!seccionTecnicaRepository.existsById(id)) {
+            throw new RuntimeException("No se encontró la sección técnica para eliminar con ID: " + id);
         }
-        return false;
+        seccionTecnicaRepository.deleteById(id);
+    }
+
+    private SeccionTecnicaDTO convertirADto(SeccionTecnicaEntity entidad) {
+        return SeccionTecnicaDTO.builder()
+                .idTecnica(entidad.getIdTecnica())
+                .tecnica(entidad.getTecnica())
+                .build();
     }
 }

@@ -13,43 +13,44 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AcademicaService {
 
     private final AcademicaRepository academicaRepository;
 
     public List<AcademicaDTO> listarTodos() {
-
         return academicaRepository.findAll()
                 .stream()
                 .map(this::convertirEntityADto)
                 .collect(Collectors.toList());
-
     }
-    public AcademicaDTO buscarPorId(Long id) {
 
-        AcademicaEntity entidad = academicaRepository.findById(id).orElseThrow(() -> new RuntimeException("Sección académica no encontrada con el ID: " + id));
+    public AcademicaDTO buscarPorId(Long id) {
+        AcademicaEntity entidad = academicaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sección académica no encontrada con el ID: " + id));
 
         return convertirEntityADto(entidad);
     }
-    public AcademicaDTO guardar(AcademicaDTO dto) {
 
+    @Transactional
+    public AcademicaDTO guardar(AcademicaDTO dto) {
         AcademicaEntity entidad = convertirDtoAEntity(dto);
         AcademicaEntity guardado = academicaRepository.save(entidad);
-
         return convertirEntityADto(guardado);
     }
 
+    @Transactional
     public AcademicaDTO actualizar(Long id, AcademicaDTO dto) {
+        AcademicaEntity entidadExistente = academicaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sección académica no encontrada con el ID: " + id));
 
-        AcademicaEntity entidadExistente = academicaRepository.findById(id).orElseThrow(() -> new RuntimeException("Sección académica no encontrada con el ID: " + id));
         entidadExistente.setSeccion(dto.getSeccion());
-
         AcademicaEntity actualizado = academicaRepository.save(entidadExistente);
         return convertirEntityADto(actualizado);
     }
 
+    @Transactional
     public AcademicaDTO actualizarAcademica(Long id, AcademicaDTO dto) {
-
         AcademicaEntity entidadExistente = academicaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sección académica no encontrada con el ID: " + id));
 
@@ -61,13 +62,13 @@ public class AcademicaService {
         return convertirEntityADto(actualizado);
     }
 
+    @Transactional
     public void eliminar(Long id) {
         if (!academicaRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar. ID no encontrado: " + id);
+            throw new RuntimeException("No se encuentra la sección académica con el ID: " + id);
         }
         academicaRepository.deleteById(id);
     }
-
 
     private AcademicaDTO convertirEntityADto(AcademicaEntity entity) {
         AcademicaDTO dto = new AcademicaDTO();
@@ -81,13 +82,5 @@ public class AcademicaService {
         entity.setIdAcademica(dto.getIdAcademica());
         entity.setSeccion(dto.getSeccion());
         return entity;
-    }
-    @Transactional
-    public boolean eliminar2(Long id) {
-        if (academicaRepository.existsById(id)) {
-            academicaRepository.deleteById(id);
-            return true;
-        }
-        return false;
     }
 }

@@ -3,67 +3,74 @@ package VisitasITR.API_PTC.Materia.Services;
 import VisitasITR.API_PTC.Materia.DTO.MateriaDTO;
 import VisitasITR.API_PTC.Materia.Entity.MateriaEntity;
 import VisitasITR.API_PTC.Materia.Repository.MateriaRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class MateriaService {
 
-    private final MateriaRepository materiaRepository;
-    @Transactional(readOnly = true)
-    public List<MateriaEntity> listarTodos() {
-        return materiaRepository.findAll();
+    @Autowired
+    private MateriaRepository materiaRepository;
+
+    public List<MateriaDTO> listarTodos() {
+        return materiaRepository.findAll().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
     }
-    @Transactional(readOnly = true)
-    public MateriaEntity buscarPorId(Long id) {
-        return materiaRepository.findById(id)
+
+    public MateriaDTO buscarPorId(Long id) {
+        MateriaEntity entity = materiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Materia no encontrada con ID: " + id));
+        return convertirADTO(entity);
     }
-    @Transactional
-    public MateriaEntity guardar(MateriaDTO dto) {
-        MateriaEntity materia = MateriaEntity.builder()
-                .nombre(dto.getNombre())
-                .tipo(dto.getTipo())
+
+    public MateriaDTO guardar(MateriaDTO dto) {
+        MateriaEntity entity = MateriaEntity.builder()
+                .nombre(dto.getNombre().toUpperCase().trim())
+                .tipo(dto.getTipo().toUpperCase().trim())
                 .build();
-        return materiaRepository.save(materia);
+        return convertirADTO(materiaRepository.save(entity));
     }
-    @Transactional
-    public MateriaEntity actualizar(Long id, MateriaDTO dto) {
-        MateriaEntity materia = buscarPorId(id);
-        materia.setNombre(dto.getNombre());
-        materia.setTipo(dto.getTipo());
-        return materiaRepository.save(materia);
+
+    public MateriaDTO actualizar(Long id, MateriaDTO dto) {
+        MateriaEntity entity = materiaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Materia no encontrada con ID: " + id));
+
+        entity.setNombre(dto.getNombre().toUpperCase().trim());
+        entity.setTipo(dto.getTipo().toUpperCase().trim());
+
+        return convertirADTO(materiaRepository.save(entity));
     }
-    @Transactional
-    public void eliminar(Long id) {
-        MateriaEntity materia = buscarPorId(id);
-        materiaRepository.delete(materia);
-    }
-    public MateriaDTO actualizarMateria(Long id, MateriaDTO dto) {
-        MateriaEntity entidadExistente = materiaRepository.findById(id)
+
+    public MateriaDTO actualizarParcial(Long id, MateriaDTO dto) {
+        MateriaEntity entity = materiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Materia no encontrada con ID: " + id));
 
         if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
-            entidadExistente.setNombre(dto.getNombre());
+            entity.setNombre(dto.getNombre().toUpperCase().trim());
+        }
+        if (dto.getTipo() != null && !dto.getTipo().isBlank()) {
+            entity.setTipo(dto.getTipo().toUpperCase().trim());
         }
 
-        MateriaEntity actualizado = materiaRepository.save(entidadExistente);
-
-        MateriaDTO respuestaDTO = new MateriaDTO();
-        respuestaDTO.setIdMateria(actualizado.getIdMateria());
-        respuestaDTO.setNombre(actualizado.getNombre());
-        return respuestaDTO;
+        return convertirADTO(materiaRepository.save(entity));
     }
-    @Transactional
-    public boolean eliminar2(Long id) {
-        if (materiaRepository.existsById(id)) {
-            materiaRepository.deleteById(id);
-            return true;
+
+    public void eliminar(Long id) {
+        if (!materiaRepository.existsById(id)) {
+            throw new RuntimeException("Materia no encontrada con ID: " + id);
         }
-        return false;
+        materiaRepository.deleteById(id);
+    }
+
+    private MateriaDTO convertirADTO(MateriaEntity entity) {
+        return MateriaDTO.builder()
+                .idMateria(entity.getIdMateria())
+                .nombre(entity.getNombre())
+                .tipo(entity.getTipo())
+                .build();
     }
 }

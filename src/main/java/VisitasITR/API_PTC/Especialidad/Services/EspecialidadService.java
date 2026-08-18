@@ -8,39 +8,46 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EspecialidadService {
 
     private final EspecialidadRepository especialidadRepository;
-    @Transactional(readOnly = true)
-    public List<EspecialidadEntity> listarTodos() {
-        return especialidadRepository.findAll();
+
+    public List<EspecialidadDTO> listarTodos() {
+        return especialidadRepository.findAll()
+                .stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
-    @Transactional(readOnly = true)
-    public EspecialidadEntity buscarPorId(Long id) {
-        return especialidadRepository.findById(id)
+
+    public EspecialidadDTO buscarPorId(Long id) {
+        EspecialidadEntity especialidad = especialidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
+        return convertirADto(especialidad);
     }
+
     @Transactional
-    public EspecialidadEntity guardar(EspecialidadDTO dto) {
+    public EspecialidadDTO guardar(EspecialidadDTO dto) {
         EspecialidadEntity especialidad = EspecialidadEntity.builder()
                 .especialidad(dto.getEspecialidad())
                 .build();
-        return especialidadRepository.save(especialidad);
+        return convertirADto(especialidadRepository.save(especialidad));
     }
+
     @Transactional
-    public EspecialidadEntity actualizar(Long id, EspecialidadDTO dto) {
-        EspecialidadEntity especialidad = buscarPorId(id);
+    public EspecialidadDTO actualizar(Long id, EspecialidadDTO dto) {
+        EspecialidadEntity especialidad = especialidadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
+
         especialidad.setEspecialidad(dto.getEspecialidad());
-        return especialidadRepository.save(especialidad);
+        return convertirADto(especialidadRepository.save(especialidad));
     }
+
     @Transactional
-    public void eliminar(Long id) {
-        EspecialidadEntity especialidad = buscarPorId(id);
-        especialidadRepository.delete(especialidad);
-    }
     public EspecialidadDTO actualizarEspecialidad(Long id, EspecialidadDTO dto) {
         EspecialidadEntity entidadExistente = especialidadRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
@@ -49,19 +56,21 @@ public class EspecialidadService {
             entidadExistente.setEspecialidad(dto.getEspecialidad());
         }
 
-        EspecialidadEntity actualizado = especialidadRepository.save(entidadExistente);
-
-        EspecialidadDTO respuestaDTO = new EspecialidadDTO();
-        respuestaDTO.setIdEspecialidad(actualizado.getIdEspecialidad());
-        respuestaDTO.setEspecialidad(actualizado.getEspecialidad());
-        return respuestaDTO;
+        return convertirADto(especialidadRepository.save(entidadExistente));
     }
+
     @Transactional
-    public boolean eliminar2(Long id) {
-        if (especialidadRepository.existsById(id)) {
-            especialidadRepository.deleteById(id);
-            return true;
+    public void eliminar(Long id) {
+        if (!especialidadRepository.existsById(id)) {
+            throw new RuntimeException("No se encontró la especialidad para eliminar con ID: " + id);
         }
-        return false;
+        especialidadRepository.deleteById(id);
+    }
+
+    private EspecialidadDTO convertirADto(EspecialidadEntity entidad) {
+        return EspecialidadDTO.builder()
+                .idEspecialidad(entidad.getIdEspecialidad())
+                .especialidad(entidad.getEspecialidad())
+                .build();
     }
 }

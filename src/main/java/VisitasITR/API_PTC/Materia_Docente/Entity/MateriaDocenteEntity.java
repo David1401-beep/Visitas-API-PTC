@@ -1,12 +1,12 @@
 package VisitasITR.API_PTC.Materia_Docente.Entity;
 
-import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
+import VisitasITR.API_PTC.Empleado.Entity.EmpleadoEntity;
 import VisitasITR.API_PTC.Materia.Entity.MateriaEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "MATERIA_DOCENTE", uniqueConstraints = @UniqueConstraint(name = "MAT_DOC_DOCENTE_UQ", columnNames = "ID_DOCENTE"))
+@Table(name = "MATERIA_DOCENTE")
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,11 +18,11 @@ public class MateriaDocenteEntity {
     @Column(name = "ID_MATERIA_DOCENTE")
     private Long idMateriaDocente;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_MATERIA", nullable = false)
     private MateriaEntity materia;
 
-    @OneToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "ID_DOCENTE", nullable = false, unique = true)
-    private DocenteEntity docente;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_EMPLEADO", nullable = false, unique = true)
+    private EmpleadoEntity empleado;
 }

@@ -1,18 +1,21 @@
 package VisitasITR.API_PTC.Cita_Reunion.Entity;
 
-import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
+import VisitasITR.API_PTC.Empleado.Entity.EmpleadoEntity;
 import VisitasITR.API_PTC.Estudiante_Encargado.Entity.EstudianteEncargadoEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "CITA_REUNION")
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "CITA_REUNION")
 public class CitaReunionEntity {
 
     @Id
@@ -20,18 +23,18 @@ public class CitaReunionEntity {
     @Column(name = "ID_CITA")
     private Long idCita;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "ID_DOCENTE", nullable = false)
-    private DocenteEntity docente;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_EMPLEADO", nullable = false)
+    private EmpleadoEntity empleado;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_ESTUDIANTE_ENCARGADO", nullable = false)
     private EstudianteEncargadoEntity estudianteEncargado;
 
-    @Column(name = "CIT_MOTIVO", length = 250)
+    @Column(name = "CIT_MOTIVO", nullable = false, length = 200)
     private String motivo;
 
-    @Column(name = "CIT_ESTADO", length = 30)
+    @Column(name = "CIT_ESTADO", nullable = false, length = 30)
     private String estado;
 
     @Column(name = "CIT_OBSERVACIONES", length = 300)

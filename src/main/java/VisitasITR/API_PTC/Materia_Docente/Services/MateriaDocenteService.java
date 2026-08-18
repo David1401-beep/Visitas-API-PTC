@@ -1,116 +1,125 @@
 package VisitasITR.API_PTC.Materia_Docente.Services;
 
-import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
-import VisitasITR.API_PTC.Docente.Repository.DocenteRepository;
+import VisitasITR.API_PTC.Empleado.Entity.EmpleadoEntity;
+import VisitasITR.API_PTC.Empleado.Repository.EmpleadoRepository;
 import VisitasITR.API_PTC.Materia.Entity.MateriaEntity;
 import VisitasITR.API_PTC.Materia.Repository.MateriaRepository;
 import VisitasITR.API_PTC.Materia_Docente.DTO.MateriaDocenteDTO;
 import VisitasITR.API_PTC.Materia_Docente.Entity.MateriaDocenteEntity;
 import VisitasITR.API_PTC.Materia_Docente.Reposity.MateriaDocenteRepository;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class MateriaDocenteService {
 
-    private final MateriaDocenteRepository materiaDocenteRepository;
-    private final MateriaRepository materiaRepository;
-    private final DocenteRepository docenteRepository;
-    @Transactional(readOnly = true)
-    public List<MateriaDocenteEntity> listarTodos() {
-        return materiaDocenteRepository.findAll();
+    @Autowired
+    private MateriaDocenteRepository materiaDocenteRepository;
+
+    @Autowired
+    private MateriaRepository materiaRepository;
+
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
+
+    public List<MateriaDocenteDTO> listarTodos() {
+        return materiaDocenteRepository.findAll().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
     }
-    @Transactional(readOnly = true)
-    public MateriaDocenteEntity buscarPorId(Long id) {
-        return materiaDocenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Relación materia-docente no encontrada con ID: " + id));
+
+    public MateriaDocenteDTO buscarPorId(Long id) {
+        MateriaDocenteEntity entity = materiaDocenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Registro no encontrado con ID: " + id));
+        return convertirADTO(entity);
     }
-    @Transactional
-    public MateriaDocenteEntity guardar(MateriaDocenteDTO dto) {
-        validarDocenteDisponible(dto.getIdDocente(), null);
+
+    public MateriaDocenteDTO guardar(MateriaDocenteDTO dto) {
+        if (materiaDocenteRepository.existsByEmpleado_IdEmpleado(dto.getIdEmpleado())) {
+            throw new RuntimeException("El empleado con ID " + dto.getIdEmpleado() + " ya tiene una materia asignada.");
+        }
+
         MateriaEntity materia = materiaRepository.findById(dto.getIdMateria())
-                .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
+                .orElseThrow(() -> new RuntimeException("La materia con ID " + dto.getIdMateria() + " no existe."));
 
-        DocenteEntity docente = docenteRepository.findById(dto.getIdDocente())
-                .orElseThrow(() -> new RuntimeException("Docente no encontrado"));
+        EmpleadoEntity empleado = empleadoRepository.findById(dto.getIdEmpleado())
+                .orElseThrow(() -> new RuntimeException("El empleado con ID " + dto.getIdEmpleado() + " no existe."));
 
-        MateriaDocenteEntity relacion = MateriaDocenteEntity.builder()
+        MateriaDocenteEntity entity = MateriaDocenteEntity.builder()
                 .materia(materia)
-                .docente(docente)
+                .empleado(empleado)
                 .build();
 
-        return materiaDocenteRepository.save(relacion);
+        return convertirADTO(materiaDocenteRepository.save(entity));
     }
+
     @Transactional
-    public MateriaDocenteEntity actualizar(Long id, MateriaDocenteDTO dto) {
-        MateriaDocenteEntity relacion = buscarPorId(id);
-        validarDocenteDisponible(dto.getIdDocente(), id);
+    public MateriaDocenteDTO actualizar(Long id, MateriaDocenteDTO dto) {
+        MateriaDocenteEntity entity = materiaDocenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Registro no encontrado con ID: " + id));
+
+        // Si cambió el empleado, verificar que el nuevo no esté repetido en otro registro
+        if (!entity.getEmpleado().getIdEmpleado().equals(dto.getIdEmpleado())) {
+            if (materiaDocenteRepository.existsByEmpleado_IdEmpleado(dto.getIdEmpleado())) {
+                throw new RuntimeException("El empleado con ID " + dto.getIdEmpleado() + " ya tiene una materia asignada.");
+            }
+        }
 
         MateriaEntity materia = materiaRepository.findById(dto.getIdMateria())
-                .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Materia no encontrada con ID: " + dto.getIdMateria()));
 
-        DocenteEntity docente = docenteRepository.findById(dto.getIdDocente())
-                .orElseThrow(() -> new RuntimeException("Docente no encontrado"));
+        EmpleadoEntity empleado = empleadoRepository.findById(dto.getIdEmpleado())
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + dto.getIdEmpleado()));
 
-        relacion.setMateria(materia);
-        relacion.setDocente(docente);
+        entity.setMateria(materia);
+        entity.setEmpleado(empleado);
 
-        return materiaDocenteRepository.save(relacion);
+        return convertirADTO(materiaDocenteRepository.save(entity));
     }
+
     @Transactional
-    public void eliminar(Long id) {
-        MateriaDocenteEntity relacion = buscarPorId(id);
-        materiaDocenteRepository.delete(relacion);
-    }
-    @Transactional
-    public MateriaDocenteDTO actualizarMateriaDocente(Long id, MateriaDocenteDTO dto) {
-        MateriaDocenteEntity entidadExistente = materiaDocenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MateriaDocente no encontrada con ID: " + id));
+    public MateriaDocenteDTO actualizarParcial(Long id, MateriaDocenteDTO dto) {
+        MateriaDocenteEntity entity = materiaDocenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Registro no encontrado con ID: " + id));
 
         if (dto.getIdMateria() != null) {
             MateriaEntity materia = materiaRepository.findById(dto.getIdMateria())
                     .orElseThrow(() -> new RuntimeException("Materia no encontrada con ID: " + dto.getIdMateria()));
-            entidadExistente.setMateria(materia);
-        }
-        if (dto.getIdDocente() != null) {
-            validarDocenteDisponible(dto.getIdDocente(), id);
-            DocenteEntity docente = docenteRepository.findById(dto.getIdDocente())
-                    .orElseThrow(() -> new RuntimeException("Docente no encontrado con ID: " + dto.getIdDocente()));
-            entidadExistente.setDocente(docente);
+            entity.setMateria(materia);
         }
 
-        MateriaDocenteEntity actualizado = materiaDocenteRepository.save(entidadExistente);
+        if (dto.getIdEmpleado() != null) {
+            if (!entity.getEmpleado().getIdEmpleado().equals(dto.getIdEmpleado())) {
+                if (materiaDocenteRepository.existsByEmpleado_IdEmpleado(dto.getIdEmpleado())) {
+                    throw new RuntimeException("El empleado con ID " + dto.getIdEmpleado() + " ya tiene una materia asignada.");
+                }
+            }
+            EmpleadoEntity empleado = empleadoRepository.findById(dto.getIdEmpleado())
+                    .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + dto.getIdEmpleado()));
+            entity.setEmpleado(empleado);
+        }
 
-        MateriaDocenteDTO respuestaDTO = new MateriaDocenteDTO();
-        respuestaDTO.setIdMateriaDocente(actualizado.getIdMateriaDocente());
-        if (actualizado.getMateria() != null) {
-            respuestaDTO.setIdMateria(actualizado.getMateria().getIdMateria());
-        }
-        if (actualizado.getDocente() != null) {
-            respuestaDTO.setIdDocente(actualizado.getDocente().getIdDocente());
-        }
-        return respuestaDTO;
+        return convertirADTO(materiaDocenteRepository.save(entity));
     }
 
-    private void validarDocenteDisponible(Long idDocente, Long idRelacionActual) {
-        materiaDocenteRepository.findByDocente_IdDocente(idDocente)
-                .filter(relacion -> !relacion.getIdMateriaDocente().equals(idRelacionActual))
-                .ifPresent(relacion -> {
-                    throw new RuntimeException(
-                            "El docente ya tiene una asignación en MATERIA_DOCENTE"
-                    );
-                });
-    }
-    @Transactional
-    public boolean eliminar2(Long id) {
-        if (materiaDocenteRepository.existsById(id)) {
-            materiaDocenteRepository.deleteById(id);
-            return true;
+    public void eliminar(Long id) {
+        if (!materiaDocenteRepository.existsById(id)) {
+            throw new RuntimeException("Registro no encontrado con ID: " + id);
         }
-        return false;
+        materiaDocenteRepository.deleteById(id);
+    }
+
+    private MateriaDocenteDTO convertirADTO(MateriaDocenteEntity entity) {
+        return MateriaDocenteDTO.builder()
+                .idMateriaDocente(entity.getIdMateriaDocente())
+                .idMateria(entity.getMateria().getIdMateria())
+                .nombreMateria(entity.getMateria().getNombre())
+                .idEmpleado(entity.getEmpleado().getIdEmpleado())
+                .nombreEmpleado(entity.getEmpleado().getEmpNombre() + " " + entity.getEmpleado().getEmpApellido())
+                .build();
     }
 }

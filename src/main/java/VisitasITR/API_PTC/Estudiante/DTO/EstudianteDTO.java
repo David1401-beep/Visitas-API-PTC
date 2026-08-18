@@ -14,29 +14,35 @@ public class EstudianteDTO {
     private Long idEstudiante;
 
     @NotBlank(message = "El nombre del estudiante es obligatorio")
-    @Size(max = 60, message = "El nombre no puede exceder los 60 caracteres")
-    private String nombre;
+    @Size(max = 60, message = "El nombre no puede superar los 60 caracteres")
+    private String estNombre;
 
     @NotBlank(message = "El apellido del estudiante es obligatorio")
-    @Size(max = 60, message = "El apellido no puede exceder los 60 caracteres")
-    private String apellido;
+    @Size(max = 60, message = "El apellido no puede superar los 60 caracteres")
+    private String estApellido;
 
-    @Size(max = 40, message = "El grado no puede exceder los 40 caracteres")
-    private String grado;
+    @NotBlank(message = "El grado es obligatorio")
+    @Size(max = 40, message = "El grado no puede superar los 40 caracteres")
+    private String estGrado;
 
-    @Size(max = 20, message = "La sección no puede exceder los 20 caracteres")
-    private String seccion;
+    @NotBlank(message = "La sección es obligatoria")
+    @Size(max = 20, message = "La sección no puede superar los 20 caracteres")
+    private String estSeccion;
 
-    @Size(max = 60, message = "La especialidad no puede exceder los 60 caracteres")
-    private String especialidad;
+    @NotBlank(message = "La especialidad es obligatoria")
+    @Size(max = 60, message = "La especialidad no puede superar los 60 caracteres")
+    private String estEspecialidad;
 
     @NotBlank(message = "El código del estudiante es obligatorio")
-    @Size(max = 20, message = "El código no puede exceder los 20 caracteres")
-    private String codigo;
+    @Size(max = 20, message = "El código no puede superar los 20 caracteres")
+    private String estCodigo;
 
     @NotNull(message = "El ID de la sección académica es obligatorio")
     private Long idAcademica;
 
     @NotNull(message = "El ID del grado es obligatorio")
     private Long idGrado;
+
+    @NotNull(message = "El ID del usuario asociado es obligatorio")
+    private Long usuarioEstudiante;
 }

@@ -1,31 +1,32 @@
 package VisitasITR.API_PTC.Encargado.DTO;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class EncargadoDTO {
 
-    private Long idPadre;
+    private Long idEncargado;
 
-    @NotNull(message = "El ID de usuario es obligatorio")
-    private Long idUsuario;
-
-    @NotBlank(message = "El nombre del encargado es obligatorio")
+    @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")
     private String nombre;
 
-    @NotBlank(message = "El apellido del encargado es obligatorio")
+    @NotBlank(message = "El apellido es obligatorio")
     @Size(max = 50, message = "El apellido no puede exceder los 50 caracteres")
     private String apellido;
 
-    @Size(max = 20, message = "El teléfono no puede exceder los 20 caracteres")
-    @Pattern(regexp = "^$|^[0-9]{4}-[0-9]{4}$", message = "El teléfono debe tener el formato 0000-0000")
+    @Pattern(regexp = "^[0-9]{4}-[0-9]{4}$", message = "El teléfono debe cumplir el formato ####-####")
     private String telefono;
+
+    @NotBlank(message = "El tipo de encargado es obligatorio")
+    private String tipo;
 }

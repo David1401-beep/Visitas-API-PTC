@@ -8,7 +8,10 @@ import java.util.Optional;
 
 @Repository
 public interface EncargadoRepository extends JpaRepository<EncargadoEntity, Long> {
-    Optional<EncargadoEntity> findByIdUsuario(Long idUsuario);
+
+
+    boolean existsByTelefono(String telefono);
+
 
     Optional<EncargadoEntity> findByTelefono(String telefono);
 }

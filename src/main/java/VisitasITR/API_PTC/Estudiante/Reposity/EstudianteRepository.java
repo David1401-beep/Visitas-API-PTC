@@ -8,5 +8,8 @@ import java.util.Optional;
 
 @Repository
 public interface EstudianteRepository extends JpaRepository<EstudianteEntity, Long> {
-    Optional<EstudianteEntity> findByCodigo(String codigo);
+
+    boolean existsByEstCodigo(String estCodigo);
+
+    Optional<EstudianteEntity> findByEstCodigo(String estCodigo);
 }

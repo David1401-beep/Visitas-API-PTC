@@ -1,18 +1,12 @@
 package VisitasITR.API_PTC.Estudiante_Encargado.Entity;
 
-import VisitasITR.API_PTC.Encargado.Entity.EncargadoEntity;
 import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
+import VisitasITR.API_PTC.Encargado.Entity.EncargadoEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(
-        name = "ESTUDIANTE_ENCARGADO",
-        uniqueConstraints = @UniqueConstraint(
-                name = "ESTUDIANTE_ENCARGADO_UQ",
-                columnNames = {"ID_ESTUDIANTE", "ID_PADRE"}
-        )
-)
+@Table(name = "ESTUDIANTE_ENCARGADO")
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,14 +18,11 @@ public class EstudianteEncargadoEntity {
     @Column(name = "ID_ESTUDIANTE_ENCARGADO")
     private Long idEstudianteEncargado;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_ESTUDIANTE", nullable = false)
     private EstudianteEntity estudiante;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "ID_PADRE", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ID_ENCARGADO", nullable = false)
     private EncargadoEntity encargado;
-
-    @Column(name = "PARENTESCO", nullable = false, length = 30)
-    private String parentesco;
 }

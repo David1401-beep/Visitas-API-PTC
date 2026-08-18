@@ -1,15 +1,17 @@
-package VisitasITR.API_PTC.Estudiante_Encargado.DTO;
+package VisitasITR.API_PTC.EstudianteEncargado.DTO;
 
-import jakarta.validation.constraints.NotBlank;
+import VisitasITR.API_PTC.Estudiante.DTO.EstudianteDTO;
+import VisitasITR.API_PTC.Encargado.DTO.EncargadoDTO;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class EstudianteEncargadoDTO {
 
     private Long idEstudianteEncargado;
@@ -18,13 +20,8 @@ public class EstudianteEncargadoDTO {
     private Long idEstudiante;
 
     @NotNull(message = "El ID del encargado es obligatorio")
-    private Long idPadre;
+    private Long idEncargado;
 
-    @NotBlank(message = "El parentesco es obligatorio")
-    @Size(max = 30, message = "El parentesco no puede exceder los 30 caracteres")
-    @Pattern(
-            regexp = "PADRE|MADRE|HERMANO MAYOR|HERMANA MAYOR|TIO|TIA|ABUELO|ABUELA",
-            message = "El parentesco enviado no está permitido"
-    )
-    private String parentesco;
+    private String nombreEstudiante;
+    private String nombreEncargado;
 }

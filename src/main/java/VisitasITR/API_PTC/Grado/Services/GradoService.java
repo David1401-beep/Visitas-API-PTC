@@ -11,37 +11,44 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class GradoService {
 
     private final GradoRepository gradoRepository;
     private final NivelRepository nivelRepository;
     private final SeccionTecnicaRepository seccionTecnicaRepository;
     private final EspecialidadRepository especialidadRepository;
-    @Transactional(readOnly = true)
-    public List<GradoEntity> listarTodos() {
-        return gradoRepository.findAll();
+
+    public List<GradoDTO> listarTodos() {
+        return gradoRepository.findAll()
+                .stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
-    @Transactional(readOnly = true)
-    public GradoEntity buscarPorId(Long id) {
-        return gradoRepository.findById(id)
+
+    public GradoDTO buscarPorId(Long id) {
+        GradoEntity grado = gradoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Grado no encontrado con ID: " + id));
+        return convertirADto(grado);
     }
+
     @Transactional
-    public GradoEntity guardar(GradoDTO dto) {
+    public GradoDTO guardar(GradoDTO dto) {
         var nivel = nivelRepository.findById(dto.getIdNivel())
                 .orElseThrow(() -> new RuntimeException("Nivel asociado no encontrado"));
 
         var tecnica = dto.getIdTecnica() != null
                 ? seccionTecnicaRepository.findById(dto.getIdTecnica())
-                    .orElseThrow(() -> new RuntimeException("Sección técnica asociada no encontrada"))
+                .orElseThrow(() -> new RuntimeException("Sección técnica asociada no encontrada"))
                 : null;
 
         var especialidad = dto.getIdEspecialidad() != null
                 ? especialidadRepository.findById(dto.getIdEspecialidad())
-                    .orElseThrow(() -> new RuntimeException("Especialidad asociada no encontrada"))
+                .orElseThrow(() -> new RuntimeException("Especialidad asociada no encontrada"))
                 : null;
 
         GradoEntity grado = GradoEntity.builder()
@@ -51,23 +58,25 @@ public class GradoService {
                 .especialidad(especialidad)
                 .build();
 
-        return gradoRepository.save(grado);
+        return convertirADto(gradoRepository.save(grado));
     }
+
     @Transactional
-    public GradoEntity actualizar(Long id, GradoDTO dto) {
-        GradoEntity grado = buscarPorId(id);
+    public GradoDTO actualizar(Long id, GradoDTO dto) {
+        GradoEntity grado = gradoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Grado no encontrado con ID: " + id));
 
         var nivel = nivelRepository.findById(dto.getIdNivel())
                 .orElseThrow(() -> new RuntimeException("Nivel asociado no encontrado"));
 
         var tecnica = dto.getIdTecnica() != null
                 ? seccionTecnicaRepository.findById(dto.getIdTecnica())
-                    .orElseThrow(() -> new RuntimeException("Sección técnica asociada no encontrada"))
+                .orElseThrow(() -> new RuntimeException("Sección técnica asociada no encontrada"))
                 : null;
 
         var especialidad = dto.getIdEspecialidad() != null
                 ? especialidadRepository.findById(dto.getIdEspecialidad())
-                    .orElseThrow(() -> new RuntimeException("Especialidad asociada no encontrada"))
+                .orElseThrow(() -> new RuntimeException("Especialidad asociada no encontrada"))
                 : null;
 
         grado.setGrado(dto.getGrado());
@@ -75,13 +84,9 @@ public class GradoService {
         grado.setSeccionTecnica(tecnica);
         grado.setEspecialidad(especialidad);
 
-        return gradoRepository.save(grado);
+        return convertirADto(gradoRepository.save(grado));
     }
-    @Transactional
-    public void eliminar(Long id) {
-        GradoEntity grado = buscarPorId(id);
-        gradoRepository.delete(grado);
-    }
+
     @Transactional
     public GradoDTO actualizarGrado(Long id, GradoDTO dto) {
         GradoEntity entidadExistente = gradoRepository.findById(id)
@@ -97,40 +102,34 @@ public class GradoService {
         if (dto.getIdTecnica() != null) {
             entidadExistente.setSeccionTecnica(
                     seccionTecnicaRepository.findById(dto.getIdTecnica())
-                            .orElseThrow(() -> new RuntimeException(
-                                    "Sección técnica asociada no encontrada"
-                            ))
+                            .orElseThrow(() -> new RuntimeException("Sección técnica asociada no encontrada"))
             );
         }
         if (dto.getIdEspecialidad() != null) {
             entidadExistente.setEspecialidad(
                     especialidadRepository.findById(dto.getIdEspecialidad())
-                            .orElseThrow(() -> new RuntimeException(
-                                    "Especialidad asociada no encontrada"
-                            ))
+                            .orElseThrow(() -> new RuntimeException("Especialidad asociada no encontrada"))
             );
         }
 
-        GradoEntity actualizado = gradoRepository.save(entidadExistente);
-
-        GradoDTO respuestaDTO = new GradoDTO();
-        respuestaDTO.setIdGrado(actualizado.getIdGrado());
-        respuestaDTO.setGrado(actualizado.getGrado());
-        respuestaDTO.setIdNivel(actualizado.getNivel().getIdNivel());
-        if (actualizado.getSeccionTecnica() != null) {
-            respuestaDTO.setIdTecnica(actualizado.getSeccionTecnica().getIdTecnica());
-        }
-        if (actualizado.getEspecialidad() != null) {
-            respuestaDTO.setIdEspecialidad(actualizado.getEspecialidad().getIdEspecialidad());
-        }
-        return respuestaDTO;
+        return convertirADto(gradoRepository.save(entidadExistente));
     }
+
     @Transactional
-    public boolean eliminar2(Long id) {
-        if (gradoRepository.existsById(id)) {
-            gradoRepository.deleteById(id);
-            return true;
+    public void eliminar(Long id) {
+        if (!gradoRepository.existsById(id)) {
+            throw new RuntimeException("No se encontró el grado para eliminar con ID: " + id);
         }
-        return false;
+        gradoRepository.deleteById(id);
+    }
+
+    private GradoDTO convertirADto(GradoEntity grado) {
+        return GradoDTO.builder()
+                .idGrado(grado.getIdGrado())
+                .grado(grado.getGrado())
+                .idNivel(grado.getNivel().getIdNivel())
+                .idTecnica(grado.getSeccionTecnica() != null ? grado.getSeccionTecnica().getIdTecnica() : null)
+                .idEspecialidad(grado.getEspecialidad() != null ? grado.getEspecialidad().getIdEspecialidad() : null)
+                .build();
     }
 }

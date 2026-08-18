@@ -8,40 +8,47 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class NivelService {
 
     private final NivelRepository nivelRepository;
-    @Transactional(readOnly = true)
-    public List<NivelEntity> listarTodos() {
-        return nivelRepository.findAll();
+
+    public List<NivelDTO> listarTodos() {
+        return nivelRepository.findAll()
+                .stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
-    @Transactional(readOnly = true)
-    public NivelEntity buscarPorId(Long id) {
-        return nivelRepository.findById(id)
+
+    public NivelDTO buscarPorId(Long id) {
+        NivelEntity nivel = nivelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Nivel no encontrado con ID: " + id));
+        return convertirADto(nivel);
     }
+
     @Transactional
-    public NivelEntity guardar(NivelDTO dto) {
+    public NivelDTO guardar(NivelDTO dto) {
         NivelEntity nivel = NivelEntity.builder()
                 .nivel(dto.getNivel())
                 .build();
-        return nivelRepository.save(nivel);
+        return convertirADto(nivelRepository.save(nivel));
     }
+
     @Transactional
-    public NivelEntity actualizar(Long id, NivelDTO dto) {
-        NivelEntity nivel = buscarPorId(id);
+    public NivelDTO actualizar(Long id, NivelDTO dto) {
+        NivelEntity nivel = nivelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nivel no encontrado con ID: " + id));
+
         nivel.setNivel(dto.getNivel());
-        return nivelRepository.save(nivel);
+        return convertirADto(nivelRepository.save(nivel));
     }
+
     @Transactional
-    public void eliminar(Long id) {
-        NivelEntity nivel = buscarPorId(id);
-        nivelRepository.delete(nivel);
-    }
-    public NivelDTO actualizarNivel(Long id, NivelDTO dto) {
+    public NivelDTO actualizarParcial(Long id, NivelDTO dto) {
         NivelEntity entidadExistente = nivelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Nivel no encontrado con ID: " + id));
 
@@ -49,19 +56,21 @@ public class NivelService {
             entidadExistente.setNivel(dto.getNivel());
         }
 
-        NivelEntity actualizado = nivelRepository.save(entidadExistente);
-
-        NivelDTO respuestaDTO = new NivelDTO();
-        respuestaDTO.setIdNivel(actualizado.getIdNivel());
-        respuestaDTO.setNivel(actualizado.getNivel());
-        return respuestaDTO;
+        return convertirADto(nivelRepository.save(entidadExistente));
     }
+
     @Transactional
-    public boolean eliminar2(Long id) {
-        if (nivelRepository.existsById(id)) {
-            nivelRepository.deleteById(id);
-            return true;
+    public void eliminar(Long id) {
+        if (!nivelRepository.existsById(id)) {
+            throw new RuntimeException("No se encontró el nivel para eliminar con ID: " + id);
         }
-        return false;
+        nivelRepository.deleteById(id);
+    }
+
+    private NivelDTO convertirADto(NivelEntity nivel) {
+        return NivelDTO.builder()
+                .idNivel(nivel.getIdNivel())
+                .nivel(nivel.getNivel())
+                .build();
     }
 }

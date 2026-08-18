@@ -3,145 +3,104 @@ package VisitasITR.API_PTC.Cita_Reunion.Services;
 import VisitasITR.API_PTC.Cita_Reunion.DTO.CitaReunionDTO;
 import VisitasITR.API_PTC.Cita_Reunion.Entity.CitaReunionEntity;
 import VisitasITR.API_PTC.Cita_Reunion.Reposity.CitaReunionRepository;
-import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
-import VisitasITR.API_PTC.Docente.Repository.DocenteRepository;
+import VisitasITR.API_PTC.Empleado.Entity.EmpleadoEntity;
+import VisitasITR.API_PTC.Empleado.Repository.EmpleadoRepository;
 import VisitasITR.API_PTC.Estudiante_Encargado.Entity.EstudianteEncargadoEntity;
 import VisitasITR.API_PTC.Estudiante_Encargado.Reposity.EstudianteEncargadoRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class CitaReunionService {
 
-    private final CitaReunionRepository citaReunionRepository;
-    private final DocenteRepository docenteRepository;
-    private final EstudianteEncargadoRepository estudianteEncargadoRepository;
+    @Autowired
+    private CitaReunionRepository citaReunionRepository;
 
-    @Transactional(readOnly = true)
-    public List<CitaReunionEntity> listarTodos() {
-        return citaReunionRepository.findAll();
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
+
+    @Autowired
+    private EstudianteEncargadoRepository estudianteEncargadoRepository;
+
+    public List<CitaReunionDTO> obtenerTodas() {
+        return citaReunionRepository.findAll()
+                .stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public List<CitaReunionEntity> listarPorDocente(Long idDocente) {
-        buscarDocente(idDocente);
-        return citaReunionRepository.findByDocente_IdDocente(idDocente);
-    }
-
-    @Transactional(readOnly = true)
-    public List<CitaReunionEntity> listarPorEstudianteEncargado(Long idRelacion) {
-        buscarRelacion(idRelacion);
-        return citaReunionRepository
-                .findByEstudianteEncargado_IdEstudianteEncargado(idRelacion);
-    }
-
-    @Transactional(readOnly = true)
-    public CitaReunionEntity buscarPorId(Long id) {
-        return citaReunionRepository.findById(id)
+    public CitaReunionDTO obtenerPorId(Long id) {
+        CitaReunionEntity cita = citaReunionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada con ID: " + id));
+        return convertirADto(cita);
     }
 
-    @Transactional
-    public CitaReunionEntity guardar(CitaReunionDTO dto) {
+    public CitaReunionDTO guardar(CitaReunionDTO dto) {
         validarEstado(dto.getEstado());
-        CitaReunionEntity cita = CitaReunionEntity.builder()
-                .docente(buscarDocente(dto.getIdDocente()))
-                .estudianteEncargado(buscarRelacion(dto.getIdEstudianteEncargado()))
+        EmpleadoEntity empleado = buscarEmpleado(dto.getIdEmpleado());
+        EstudianteEncargadoEntity rel = buscarRelacion(dto.getIdEstudianteEncargado());
+
+        CitaReunionEntity entity = CitaReunionEntity.builder()
+                .empleado(empleado)
+                .estudianteEncargado(rel)
                 .motivo(dto.getMotivo())
                 .estado(dto.getEstado())
                 .observaciones(dto.getObservaciones())
                 .fechaReunion(dto.getFechaReunion())
                 .build();
 
-        return citaReunionRepository.save(cita);
+        return convertirADto(citaReunionRepository.save(entity));
     }
 
-    @Transactional
-    public CitaReunionEntity actualizar(Long id, CitaReunionDTO dto) {
-        CitaReunionEntity cita = buscarPorId(id);
+    public CitaReunionDTO actualizar(Long id, CitaReunionDTO dto) {
         validarEstado(dto.getEstado());
-        cita.setDocente(buscarDocente(dto.getIdDocente()));
-        cita.setEstudianteEncargado(buscarRelacion(dto.getIdEstudianteEncargado()));
+        CitaReunionEntity cita = citaReunionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada con ID: " + id));
+
+        EmpleadoEntity empleado = buscarEmpleado(dto.getIdEmpleado());
+        EstudianteEncargadoEntity rel = buscarRelacion(dto.getIdEstudianteEncargado());
+
+        cita.setEmpleado(empleado);
+        cita.setEstudianteEncargado(rel);
         cita.setMotivo(dto.getMotivo());
         cita.setEstado(dto.getEstado());
         cita.setObservaciones(dto.getObservaciones());
         cita.setFechaReunion(dto.getFechaReunion());
-        return citaReunionRepository.save(cita);
-    }
-
-    @Transactional
-    public CitaReunionDTO actualizarParcial(Long id, CitaReunionDTO dto) {
-        CitaReunionEntity cita = buscarPorId(id);
-
-        if (dto.getIdDocente() != null) {
-            cita.setDocente(buscarDocente(dto.getIdDocente()));
-        }
-        if (dto.getIdEstudianteEncargado() != null) {
-            cita.setEstudianteEncargado(buscarRelacion(dto.getIdEstudianteEncargado()));
-        }
-        if (dto.getMotivo() != null) {
-            cita.setMotivo(dto.getMotivo());
-        }
-        if (dto.getEstado() != null) {
-            validarEstado(dto.getEstado());
-            cita.setEstado(dto.getEstado());
-        }
-        if (dto.getObservaciones() != null) {
-            cita.setObservaciones(dto.getObservaciones());
-        }
-        if (dto.getFechaReunion() != null) {
-            cita.setFechaReunion(dto.getFechaReunion());
-        }
 
         return convertirADto(citaReunionRepository.save(cita));
     }
 
-    @Transactional
-    public boolean eliminar(Long id) {
+    public void eliminar(Long id) {
         if (!citaReunionRepository.existsById(id)) {
-            return false;
+            throw new RuntimeException("Cita no encontrada con ID: " + id);
         }
         citaReunionRepository.deleteById(id);
-        return true;
     }
 
-    private DocenteEntity buscarDocente(Long idDocente) {
-        return docenteRepository.findById(idDocente)
-                .orElseThrow(() -> new RuntimeException(
-                        "Docente no encontrado con ID: " + idDocente
-                ));
-    }
-
-    private void validarEstado(String estado) {
-        if (estado != null && !List.of(
-                "PENDIENTE",
-                "ACEPTADA",
-                "RECHAZADA",
-                "CANCELADA",
-                "FINALIZADA"
-        ).contains(estado)) {
-            throw new RuntimeException("El estado de la cita no está permitido");
-        }
+    private EmpleadoEntity buscarEmpleado(Long idEmpleado) {
+        return empleadoRepository.findById(idEmpleado)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + idEmpleado));
     }
 
     private EstudianteEncargadoEntity buscarRelacion(Long idRelacion) {
         return estudianteEncargadoRepository.findById(idRelacion)
-                .orElseThrow(() -> new RuntimeException(
-                        "Relación estudiante-encargado no encontrada con ID: " + idRelacion
-                ));
+                .orElseThrow(() -> new RuntimeException("Relación estudiante-encargado no encontrada con ID: " + idRelacion));
+    }
+
+    private void validarEstado(String estado) {
+        if (estado != null && !List.of("PENDIENTE", "ACEPTADA", "RECHAZADA", "CANCELADA", "FINALIZADA").contains(estado)) {
+            throw new RuntimeException("El estado de la cita no está permitido");
+        }
     }
 
     private CitaReunionDTO convertirADto(CitaReunionEntity cita) {
         return CitaReunionDTO.builder()
                 .idCita(cita.getIdCita())
-                .idDocente(cita.getDocente().getIdDocente())
-                .idEstudianteEncargado(
-                        cita.getEstudianteEncargado().getIdEstudianteEncargado()
-                )
+                .idEmpleado(cita.getEmpleado().getIdEmpleado())
+                .idEstudianteEncargado(cita.getEstudianteEncargado().getIdEstudianteEncargado())
                 .motivo(cita.getMotivo())
                 .estado(cita.getEstado())
                 .observaciones(cita.getObservaciones())

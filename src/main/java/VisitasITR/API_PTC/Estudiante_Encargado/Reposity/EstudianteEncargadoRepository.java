@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EstudianteEncargadoRepository extends JpaRepository<EstudianteEncargadoEntity, Long> {
-    boolean existsByEstudiante_IdEstudianteAndEncargado_IdPadre(Long idEstudiante, Long idPadre);
 }
