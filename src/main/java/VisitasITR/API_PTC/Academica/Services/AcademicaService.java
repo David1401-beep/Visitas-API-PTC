@@ -32,6 +32,8 @@ public class AcademicaService {
         return convertirEntityADto(entidad);
     }
 
+    // Por defecto, los métodos de esta clase trabajan como operaciones de lectura.
+// Los métodos que modifican datos llevan su propio @Transactional.
     @Transactional
     public AcademicaDTO guardar(AcademicaDTO dto) {
         AcademicaEntity entidad = convertirDtoAEntity(dto);
