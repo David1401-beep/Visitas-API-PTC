@@ -1,6 +1,8 @@
 package VisitasITR.API_PTC.Usuarios.Controller;
 
 import VisitasITR.API_PTC.Response.ApiResponse;
+import VisitasITR.API_PTC.Usuarios.DTO.InicioSesionEncargadoRequest;
+import VisitasITR.API_PTC.Usuarios.DTO.SesionEncargadoDTO;
 import VisitasITR.API_PTC.Usuarios.DTO.UsuariosDTO;
 import VisitasITR.API_PTC.Usuarios.Services.UsuariosService;
 import jakarta.validation.Valid;
@@ -12,11 +14,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-    @RequestMapping("/api/v1/usuarios")
+@RequestMapping("/api/v1/usuarios")
 @RequiredArgsConstructor
 public class UsuariosController {
 
     private final UsuariosService usuariosService;
+
+    @PostMapping("/inicio-sesion-encargado")
+    public ResponseEntity<ApiResponse<SesionEncargadoDTO>> iniciarSesionEncargado(
+            @Valid @RequestBody InicioSesionEncargadoRequest request
+    ) {
+        SesionEncargadoDTO sesion = usuariosService.iniciarSesionEncargado(request);
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Inicio de sesión del encargado realizado con éxito.",
+                sesion
+        ));
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UsuariosDTO>>> listar() {

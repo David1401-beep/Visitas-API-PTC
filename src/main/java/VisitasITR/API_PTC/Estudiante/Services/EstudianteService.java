@@ -3,7 +3,8 @@ package VisitasITR.API_PTC.Estudiante.Services;
 import VisitasITR.API_PTC.Estudiante.DTO.EstudianteDTO;
 import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import VisitasITR.API_PTC.Estudiante.Reposity.EstudianteRepository;
-import VisitasITR.API_PTC.Estudiante.Reposity.EstudianteRepository;
+import VisitasITR.API_PTC.Usuarios.Entity.UsuariosEntity;
+import VisitasITR.API_PTC.Usuarios.Repository.UsuariosRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class EstudianteService {
 
     private final EstudianteRepository estudianteRepository;
+    private final UsuariosRepository usuariosRepository;
 
     public List<EstudianteDTO> listarTodos() {
         return estudianteRepository.findAll()
@@ -37,6 +39,8 @@ public class EstudianteService {
             throw new RuntimeException("El código del estudiante ya se encuentra registrado.");
         }
 
+        UsuariosEntity usuario = buscarUsuario(dto.getUsuarioEstudiante());
+
         EstudianteEntity estudiante = EstudianteEntity.builder()
                 .estNombre(dto.getEstNombre())
                 .estApellido(dto.getEstApellido())
@@ -46,7 +50,7 @@ public class EstudianteService {
                 .estCodigo(dto.getEstCodigo())
                 .idAcademica(dto.getIdAcademica())
                 .idGrado(dto.getIdGrado())
-                .usuarioEstudiante(dto.getUsuarioEstudiante())
+                .usuarioEstudiante(usuario)
                 .build();
 
         return convertirADto(estudianteRepository.save(estudiante));
@@ -65,7 +69,7 @@ public class EstudianteService {
         estudiante.setEstCodigo(dto.getEstCodigo());
         estudiante.setIdAcademica(dto.getIdAcademica());
         estudiante.setIdGrado(dto.getIdGrado());
-        estudiante.setUsuarioEstudiante(dto.getUsuarioEstudiante());
+        estudiante.setUsuarioEstudiante(buscarUsuario(dto.getUsuarioEstudiante()));
 
         return convertirADto(estudianteRepository.save(estudiante));
     }
@@ -100,7 +104,7 @@ public class EstudianteService {
             estudiante.setIdGrado(dto.getIdGrado());
         }
         if (dto.getUsuarioEstudiante() != null) {
-            estudiante.setUsuarioEstudiante(dto.getUsuarioEstudiante());
+            estudiante.setUsuarioEstudiante(buscarUsuario(dto.getUsuarioEstudiante()));
         }
 
         return convertirADto(estudianteRepository.save(estudiante));
@@ -125,7 +129,14 @@ public class EstudianteService {
                 .estCodigo(entidad.getEstCodigo())
                 .idAcademica(entidad.getIdAcademica())
                 .idGrado(entidad.getIdGrado())
-                .usuarioEstudiante(entidad.getUsuarioEstudiante())
+                .usuarioEstudiante(entidad.getUsuarioEstudiante().getIdUsuario())
                 .build();
+    }
+
+    private UsuariosEntity buscarUsuario(Long idUsuario) {
+        return usuariosRepository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException(
+                        "Usuario no encontrado con ID: " + idUsuario
+                ));
     }
 }

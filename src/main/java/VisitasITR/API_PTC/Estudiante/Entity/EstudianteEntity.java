@@ -1,5 +1,6 @@
 package VisitasITR.API_PTC.Estudiante.Entity;
 
+import VisitasITR.API_PTC.Usuarios.Entity.UsuariosEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,6 +44,11 @@ public class EstudianteEntity {
     @Column(name = "ID_GRADO", nullable = false)
     private Long idGrado;
 
-    @Column(name = "USUARIO_ESTUDIANTE", nullable = false)
-    private Long usuarioEstudiante;
+    /**
+     * Usuario que contiene el correo institucional del estudiante y que utiliza
+     * el encargado para iniciar sesión en la aplicación de padres.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USUARIO_ESTUDIANTE", nullable = false)
+    private UsuariosEntity usuarioEstudiante;
 }
