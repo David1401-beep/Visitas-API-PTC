@@ -2,11 +2,12 @@ package VisitasITR.API_PTC.Estudiante.Services;
 
 import VisitasITR.API_PTC.Estudiante.DTO.EstudianteDTO;
 import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
-import VisitasITR.API_PTC.Estudiante.Reposity.EstudianteRepository;
-import VisitasITR.API_PTC.Estudiante.Reposity.EstudianteRepository;
+import VisitasITR.API_PTC.Estudiante.Repository.EstudianteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,14 +28,18 @@ public class EstudianteService {
 
     public EstudianteDTO buscarPorId(Long id) {
         EstudianteEntity estudiante = estudianteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Estudiante no encontrado con ID: " + id));
         return convertirADto(estudiante);
     }
 
     @Transactional
     public EstudianteDTO guardar(EstudianteDTO dto) {
-        if (estudianteRepository.existsByEstCodigo(dto.getEstCodigo())) {
-            throw new RuntimeException("El código del estudiante ya se encuentra registrado.");
+        String codigoLimpio = dto.getEstCodigo().trim();
+
+        if (estudianteRepository.existsByEstCodigoIgnoreCase(codigoLimpio)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "El código de estudiante '" + codigoLimpio + "' ya se encuentra registrado.");
         }
 
         EstudianteEntity estudiante = EstudianteEntity.builder()
@@ -43,7 +48,7 @@ public class EstudianteService {
                 .estGrado(dto.getEstGrado())
                 .estSeccion(dto.getEstSeccion())
                 .estEspecialidad(dto.getEstEspecialidad())
-                .estCodigo(dto.getEstCodigo())
+                .estCodigo(codigoLimpio)
                 .idAcademica(dto.getIdAcademica())
                 .idGrado(dto.getIdGrado())
                 .usuarioEstudiante(dto.getUsuarioEstudiante())
@@ -55,14 +60,22 @@ public class EstudianteService {
     @Transactional
     public EstudianteDTO actualizar(Long id, EstudianteDTO dto) {
         EstudianteEntity estudiante = estudianteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Estudiante no encontrado con ID: " + id));
+
+        String codigoLimpio = dto.getEstCodigo().trim();
+
+        if (estudianteRepository.existsByEstCodigoIgnoreCaseAndIdEstudianteNot(codigoLimpio, id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "El código '" + codigoLimpio + "' pertenece a otro estudiante.");
+        }
 
         estudiante.setEstNombre(dto.getEstNombre());
         estudiante.setEstApellido(dto.getEstApellido());
         estudiante.setEstGrado(dto.getEstGrado());
         estudiante.setEstSeccion(dto.getEstSeccion());
         estudiante.setEstEspecialidad(dto.getEstEspecialidad());
-        estudiante.setEstCodigo(dto.getEstCodigo());
+        estudiante.setEstCodigo(codigoLimpio);
         estudiante.setIdAcademica(dto.getIdAcademica());
         estudiante.setIdGrado(dto.getIdGrado());
         estudiante.setUsuarioEstudiante(dto.getUsuarioEstudiante());
@@ -73,7 +86,8 @@ public class EstudianteService {
     @Transactional
     public EstudianteDTO actualizarParcial(Long id, EstudianteDTO dto) {
         EstudianteEntity estudiante = estudianteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Estudiante no encontrado con ID: " + id));
 
         if (dto.getEstNombre() != null && !dto.getEstNombre().isBlank()) {
             estudiante.setEstNombre(dto.getEstNombre());
@@ -91,7 +105,12 @@ public class EstudianteService {
             estudiante.setEstEspecialidad(dto.getEstEspecialidad());
         }
         if (dto.getEstCodigo() != null && !dto.getEstCodigo().isBlank()) {
-            estudiante.setEstCodigo(dto.getEstCodigo());
+            String codigoLimpio = dto.getEstCodigo().trim();
+            if (estudianteRepository.existsByEstCodigoIgnoreCaseAndIdEstudianteNot(codigoLimpio, id)) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT, "El código '" + codigoLimpio + "' ya está registrado en otro estudiante.");
+            }
+            estudiante.setEstCodigo(codigoLimpio);
         }
         if (dto.getIdAcademica() != null) {
             estudiante.setIdAcademica(dto.getIdAcademica());
@@ -109,7 +128,8 @@ public class EstudianteService {
     @Transactional
     public void eliminar(Long id) {
         if (!estudianteRepository.existsById(id)) {
-            throw new RuntimeException("No se encontró el estudiante para eliminar con ID: " + id);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No se encontró el estudiante para eliminar con ID: " + id);
         }
         estudianteRepository.deleteById(id);
     }

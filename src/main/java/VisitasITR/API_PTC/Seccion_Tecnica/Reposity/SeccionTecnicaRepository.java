@@ -1,4 +1,4 @@
-package VisitasITR.API_PTC.Seccion_Tecnica.Reposity;
+package VisitasITR.API_PTC.Seccion_Tecnica.Repository;
 
 import VisitasITR.API_PTC.Seccion_Tecnica.Entity.SeccionTecnicaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
