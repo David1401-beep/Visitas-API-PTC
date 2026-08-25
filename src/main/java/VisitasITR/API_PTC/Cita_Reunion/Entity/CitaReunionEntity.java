@@ -1,6 +1,6 @@
 package VisitasITR.API_PTC.Cita_Reunion.Entity;
 
-import VisitasITR.API_PTC.Empleado.Entity.EmpleadoEntity;
+import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
 import VisitasITR.API_PTC.Estudiante_Encargado.Entity.EstudianteEncargadoEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,8 +24,8 @@ public class CitaReunionEntity {
     private Long idCita;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_EMPLEADO", nullable = false)
-    private EmpleadoEntity empleado;
+    @JoinColumn(name = "ID_DOCENTE", nullable = false)
+    private DocenteEntity docente;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_ESTUDIANTE_ENCARGADO", nullable = false)

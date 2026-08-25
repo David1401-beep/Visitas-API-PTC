@@ -1,8 +1,6 @@
 package VisitasITR.API_PTC.Cita_Reunion.DTO;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +16,8 @@ public class CitaReunionDTO {
 
     private Long idCita;
 
-    @NotNull(message = "El ID del empleado es obligatorio")
-    private Long idEmpleado;
+    @NotNull(message = "El ID del docente es obligatorio")
+    private Long idDocente;
 
     @NotNull(message = "El ID del estudiante-encargado es obligatorio")
     private Long idEstudianteEncargado;
@@ -29,12 +27,16 @@ public class CitaReunionDTO {
     private String motivo;
 
     @NotBlank(message = "El estado de la cita es obligatorio")
-    @Size(max = 20, message = "El estado no puede superar los 20 caracteres")
+    @Pattern(
+            regexp = "PENDIENTE|ACEPTADA|RECHAZADA|CANCELADA|FINALIZADA",
+            message = "El estado de la cita debe ser: PENDIENTE, ACEPTADA, RECHAZADA, CANCELADA o FINALIZADA"
+    )
     private String estado;
 
-    @Size(max = 255, message = "Las observaciones no pueden superar los 255 caracteres")
+    @Size(max = 300, message = "Las observaciones no pueden superar los 300 caracteres")
     private String observaciones;
 
     @NotNull(message = "La fecha y hora de la reunión es obligatoria")
+    @Future(message = "La fecha y la hora tiene que ser futura")
     private LocalDateTime fechaReunion;
 }

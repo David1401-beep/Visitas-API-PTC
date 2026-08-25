@@ -1,8 +1,8 @@
 package VisitasITR.API_PTC.Especialidad.Controller;
 
-import VisitasITR.API_PTC.Response.ApiResponse;
 import VisitasITR.API_PTC.Especialidad.DTO.EspecialidadDTO;
 import VisitasITR.API_PTC.Especialidad.Services.EspecialidadService;
+import VisitasITR.API_PTC.Response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,14 +38,20 @@ public class EspecialidadController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<EspecialidadDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody EspecialidadDTO dto) {
+    public ResponseEntity<ApiResponse<EspecialidadDTO>> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody EspecialidadDTO dto
+    ) {
         EspecialidadDTO actualizado = especialidadService.actualizar(id, dto);
         return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad actualizada completamente.", actualizado));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<EspecialidadDTO>> actualizarEspecialidad(@PathVariable Long id, @RequestBody EspecialidadDTO dto) {
-        EspecialidadDTO actualizado = especialidadService.actualizarEspecialidad(id, dto);
+    public ResponseEntity<ApiResponse<EspecialidadDTO>> actualizarEspecialidad(
+            @PathVariable Long id,
+            @RequestBody EspecialidadDTO dto
+    ) {
+        EspecialidadDTO actualizado = especialidadService.actualizar(id, dto);
         return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad actualizada parcialmente con éxito.", actualizado));
     }
 

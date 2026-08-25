@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ACADEMICA", uniqueConstraints = @UniqueConstraint(name = "ACADEMICA_NOMBRE_UQ", columnNames = "ACADEMICA"))
-
 public class AcademicaEntity {
 
     @Id

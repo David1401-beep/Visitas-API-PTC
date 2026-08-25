@@ -17,9 +17,9 @@ public class MateriaDocenteDTO {
     @NotNull(message = "El ID de la materia es obligatorio")
     private Long idMateria;
 
-    @NotNull(message = "El ID del empleado es obligatorio")
-    private Long idEmpleado;
+    @NotNull(message = "El ID del docente es obligatorio")
+    private Long idDocente;
 
     private String nombreMateria;
-    private String nombreEmpleado;
+    private String nombreDocente;
 }

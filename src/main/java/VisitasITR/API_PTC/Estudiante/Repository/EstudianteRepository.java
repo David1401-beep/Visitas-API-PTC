@@ -1,4 +1,4 @@
-package VisitasITR.API_PTC.Estudiante.Reposity;
+package VisitasITR.API_PTC.Estudiante.Repository;
 
 import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,8 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface EstudianteRepository extends JpaRepository<EstudianteEntity, Long> {
-
-    boolean existsByEstCodigo(String estCodigo);
-
-    Optional<EstudianteEntity> findByEstCodigo(String estCodigo);
+    Optional<EstudianteEntity> findByEstNie(String estNie);
+    boolean existsByEstNie(String estNie);
 }

@@ -1,12 +1,18 @@
 package VisitasITR.API_PTC.Estudiante_Encargado.Entity;
 
-import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import VisitasITR.API_PTC.Encargado.Entity.EncargadoEntity;
+import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "ESTUDIANTE_ENCARGADO")
+@Table(
+        name = "ESTUDIANTE_ENCARGADO",
+        uniqueConstraints = @UniqueConstraint(
+                name = "UQ_ESTUDIANTE_ENCARGADO",
+                columnNames = {"ID_ESTUDIANTE", "ID_ENCARGADO"}
+        )
+)
 @Data
 @Builder
 @NoArgsConstructor

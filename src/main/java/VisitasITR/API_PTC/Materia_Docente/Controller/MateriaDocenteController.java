@@ -4,7 +4,7 @@ import VisitasITR.API_PTC.Materia_Docente.DTO.MateriaDocenteDTO;
 import VisitasITR.API_PTC.Materia_Docente.Services.MateriaDocenteService;
 import VisitasITR.API_PTC.Response.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/materia-docentes")
+@RequiredArgsConstructor
 public class MateriaDocenteController {
 
-    @Autowired
-    private MateriaDocenteService materiaDocenteService;
+    private final MateriaDocenteService materiaDocenteService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<MateriaDocenteDTO>>> listar() {
@@ -27,7 +27,7 @@ public class MateriaDocenteController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MateriaDocenteDTO>> obtenerPorId(@PathVariable Long id) {
         MateriaDocenteDTO dto = materiaDocenteService.buscarPorId(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Registro encontrado.", dto));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Registro encontrado con éxito.", dto));
     }
 
     @PostMapping

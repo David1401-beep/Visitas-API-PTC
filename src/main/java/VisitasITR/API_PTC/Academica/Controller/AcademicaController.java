@@ -56,7 +56,6 @@ public class AcademicaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         academicaService.eliminar(id);
-        ApiResponse<Void> respuesta = new ApiResponse<>(true, "Sección académica eliminada exitosamente.", null);
-        return ResponseEntity.ok(respuesta);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Registro académico eliminado exitosamente.", null));
     }
 }

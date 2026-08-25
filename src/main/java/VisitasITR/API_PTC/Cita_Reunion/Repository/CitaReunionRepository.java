@@ -1,4 +1,4 @@
-package VisitasITR.API_PTC.Cita_Reunion.Reposity;
+package VisitasITR.API_PTC.Cita_Reunion.Repository;
 
 import VisitasITR.API_PTC.Cita_Reunion.Entity.CitaReunionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

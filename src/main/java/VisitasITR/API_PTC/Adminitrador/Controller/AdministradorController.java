@@ -1,43 +1,51 @@
 package VisitasITR.API_PTC.Adminitrador.Controller;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import VisitasITR.API_PTC.Administrador.DTO.AdministradorDTO;
+import VisitasITR.API_PTC.Adminitrador.Services.AdministradorServices;
+import VisitasITR.API_PTC.Response.ApiResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Entity
-@Table(name = "ADMINISTRADOR")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AdministradorEntity {
+import java.util.List;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_ADMINISTRADOR")
-    private Long idAdministrador;
+@RestController
+@RequestMapping("/api/v1/administradores")
+@RequiredArgsConstructor
+public class AdministradorController {
 
-    @Column(name = "ADM_NOMBRES", nullable = false, length = 100)
-    private String admNombres;
+    private final AdministradorServices administradorServices;
 
-    @Column(name = "ADM_APELLIDOS", nullable = false, length = 100)
-    private String admApellidos;
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<AdministradorDTO>>> listar() {
+        List<AdministradorDTO> lista = administradorServices.obtenerTodos();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Lista de administradores obtenida con éxito.", lista));
+    }
 
-    @Column(name = "ADM_CORREO", nullable = false, unique = true, length = 150)
-    private String admCorreo;
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<AdministradorDTO>> obtenerPorId(@PathVariable Long id) {
+        AdministradorDTO dto = administradorServices.obtenerPorId(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Administrador encontrado con éxito.", dto));
+    }
 
-    @Column(name = "ADM_PASSWORD", nullable = false, length = 255)
-    private String admPassword;
+    @PostMapping
+    public ResponseEntity<ApiResponse<AdministradorDTO>> crear(@Valid @RequestBody AdministradorDTO dto) {
+        AdministradorDTO nuevo = administradorServices.crear(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(true, "Administrador registrado exitosamente.", nuevo));
+    }
 
-    @Column(name = "ADM_DUI", length = 10)
-    private String admDui;
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<AdministradorDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody AdministradorDTO dto) {
+        AdministradorDTO actualizado = administradorServices.actualizar(id, dto);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Administrador actualizado correctamente.", actualizado));
+    }
 
-    @Column(name = "ADM_TELEFONO", length = 15)
-    private String admTelefono;
-
-    @Column(name = "ADM_ESTADO", nullable = false, length = 20)
-    private String admEstado;
-
-    @Column(name = "ADM_ROL", nullable = false, length = 30)
-    private String admRol;
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
+        administradorServices.eliminar(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Administrador eliminado correctamente.", null));
+    }
 }

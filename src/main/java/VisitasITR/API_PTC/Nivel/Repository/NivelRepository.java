@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NivelRepository extends JpaRepository<NivelEntity, Long> {
+
+    boolean existsByNivelIgnoreCase(String nivel);
+
+    boolean existsByNivelIgnoreCaseAndIdNivelNot(String nivel, Long idNivel);
 }

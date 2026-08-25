@@ -19,6 +19,6 @@ public class SeccionTecnicaEntity {
     @Column(name = "ID_TECNICA")
     private Long idTecnica;
 
-    @Column(name = "TECNICA", nullable = false, length = 20)
+    @Column(name = "TECNICA", nullable = false, length = 20, unique = true)
     private String tecnica;
 }

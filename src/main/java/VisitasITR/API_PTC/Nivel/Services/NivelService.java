@@ -4,8 +4,10 @@ import VisitasITR.API_PTC.Nivel.DTO.NivelDTO;
 import VisitasITR.API_PTC.Nivel.Entity.NivelEntity;
 import VisitasITR.API_PTC.Nivel.Repository.NivelRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,34 +28,58 @@ public class NivelService {
 
     public NivelDTO buscarPorId(Long id) {
         NivelEntity nivel = nivelRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Nivel no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Nivel no encontrado con ID: " + id));
         return convertirADto(nivel);
     }
 
     @Transactional
     public NivelDTO guardar(NivelDTO dto) {
+        String nivelLimpio = dto.getNivel().trim().toUpperCase();
+
+        if (nivelRepository.existsByNivelIgnoreCase(nivelLimpio)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "El nivel '" + nivelLimpio + "' ya se encuentra registrado.");
+        }
+
         NivelEntity nivel = NivelEntity.builder()
-                .nivel(dto.getNivel())
+                .nivel(nivelLimpio)
                 .build();
+
         return convertirADto(nivelRepository.save(nivel));
     }
 
     @Transactional
     public NivelDTO actualizar(Long id, NivelDTO dto) {
         NivelEntity nivel = nivelRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Nivel no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Nivel no encontrado con ID: " + id));
 
-        nivel.setNivel(dto.getNivel());
+        String nivelLimpio = dto.getNivel().trim().toUpperCase();
+
+        if (nivelRepository.existsByNivelIgnoreCaseAndIdNivelNot(nivelLimpio, id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "El nivel '" + nivelLimpio + "' ya existe en otro registro.");
+        }
+
+        nivel.setNivel(nivelLimpio);
         return convertirADto(nivelRepository.save(nivel));
     }
 
     @Transactional
     public NivelDTO actualizarParcial(Long id, NivelDTO dto) {
         NivelEntity entidadExistente = nivelRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Nivel no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Nivel no encontrado con ID: " + id));
 
         if (dto.getNivel() != null && !dto.getNivel().isBlank()) {
-            entidadExistente.setNivel(dto.getNivel());
+            String nivelLimpio = dto.getNivel().trim().toUpperCase();
+
+            if (nivelRepository.existsByNivelIgnoreCaseAndIdNivelNot(nivelLimpio, id)) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT, "El nivel '" + nivelLimpio + "' ya existe en otro registro.");
+            }
+            entidadExistente.setNivel(nivelLimpio);
         }
 
         return convertirADto(nivelRepository.save(entidadExistente));
@@ -62,7 +88,8 @@ public class NivelService {
     @Transactional
     public void eliminar(Long id) {
         if (!nivelRepository.existsById(id)) {
-            throw new RuntimeException("No se encontró el nivel para eliminar con ID: " + id);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No se encontró el nivel para eliminar con ID: " + id);
         }
         nivelRepository.deleteById(id);
     }

@@ -4,7 +4,7 @@ import VisitasITR.API_PTC.Materia.DTO.MateriaDTO;
 import VisitasITR.API_PTC.Materia.Services.MateriaService;
 import VisitasITR.API_PTC.Response.ApiResponse;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/materias")
+@RequiredArgsConstructor
 public class MateriaController {
 
-    @Autowired
-    private MateriaService materiaService;
+    private final MateriaService materiaService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<MateriaDTO>>> listar() {

@@ -2,7 +2,7 @@ package VisitasITR.API_PTC.Grado.Entity;
 
 import VisitasITR.API_PTC.Especialidad.Entity.EspecialidadEntity;
 import VisitasITR.API_PTC.Nivel.Entity.NivelEntity;
-import VisitasITR.API_PTC.Seccion_Tecnica.Entity.SeccionTecnicaEntity; // Corregido el import aquí
+import VisitasITR.API_PTC.Seccion_Tecnica.Entity.SeccionTecnicaEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

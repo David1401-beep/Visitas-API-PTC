@@ -19,6 +19,6 @@ public class NivelEntity {
     @Column(name = "ID_NIVEL")
     private Long idNivel;
 
-    @Column(name = "NIVEL", nullable = false, length = 40)
+    @Column(name = "NIVEL", nullable = false, length = 40, unique = true)
     private String nivel;
 }

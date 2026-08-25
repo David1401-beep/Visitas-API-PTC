@@ -1,7 +1,5 @@
-package VisitasITR.API_PTC.EstudianteEncargado.DTO;
+package VisitasITR.API_PTC.Estudiante_Encargado.DTO;
 
-import VisitasITR.API_PTC.Estudiante.DTO.EstudianteDTO;
-import VisitasITR.API_PTC.Encargado.DTO.EncargadoDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

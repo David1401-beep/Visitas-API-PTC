@@ -2,10 +2,12 @@ package VisitasITR.API_PTC.Especialidad.Services;
 
 import VisitasITR.API_PTC.Especialidad.DTO.EspecialidadDTO;
 import VisitasITR.API_PTC.Especialidad.Entity.EspecialidadEntity;
-import VisitasITR.API_PTC.Especialidad.Reposity.EspecialidadRepository;
+import VisitasITR.API_PTC.Especialidad.Repository.EspecialidadRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,34 +28,58 @@ public class EspecialidadService {
 
     public EspecialidadDTO buscarPorId(Long id) {
         EspecialidadEntity especialidad = especialidadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Especialidad no encontrada con ID: " + id));
         return convertirADto(especialidad);
     }
 
     @Transactional
     public EspecialidadDTO guardar(EspecialidadDTO dto) {
+        String nombreLimpio = dto.getEspecialidad().trim();
+
+        if (especialidadRepository.existsByEspecialidadIgnoreCase(nombreLimpio)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "La especialidad '" + nombreLimpio + "' ya existe.");
+        }
+
         EspecialidadEntity especialidad = EspecialidadEntity.builder()
-                .especialidad(dto.getEspecialidad())
+                .especialidad(nombreLimpio)
                 .build();
+
         return convertirADto(especialidadRepository.save(especialidad));
     }
 
     @Transactional
     public EspecialidadDTO actualizar(Long id, EspecialidadDTO dto) {
         EspecialidadEntity especialidad = especialidadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Especialidad no encontrada con ID: " + id));
 
-        especialidad.setEspecialidad(dto.getEspecialidad());
+        String nombreLimpio = dto.getEspecialidad().trim();
+
+        if (especialidadRepository.existsByEspecialidadIgnoreCaseAndIdEspecialidadNot(nombreLimpio, id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "La especialidad '" + nombreLimpio + "' ya pertenece a otro registro.");
+        }
+
+        especialidad.setEspecialidad(nombreLimpio);
         return convertirADto(especialidadRepository.save(especialidad));
     }
 
     @Transactional
-    public EspecialidadDTO actualizarEspecialidad(Long id, EspecialidadDTO dto) {
+    public EspecialidadDTO actualizarParcial(Long id, EspecialidadDTO dto) {
         EspecialidadEntity entidadExistente = especialidadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Especialidad no encontrada con ID: " + id));
 
         if (dto.getEspecialidad() != null && !dto.getEspecialidad().isBlank()) {
-            entidadExistente.setEspecialidad(dto.getEspecialidad());
+            String nombreLimpio = dto.getEspecialidad().trim();
+
+            if (especialidadRepository.existsByEspecialidadIgnoreCaseAndIdEspecialidadNot(nombreLimpio, id)) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT, "La especialidad '" + nombreLimpio + "' ya existe.");
+            }
+            entidadExistente.setEspecialidad(nombreLimpio);
         }
 
         return convertirADto(especialidadRepository.save(entidadExistente));
@@ -62,7 +88,8 @@ public class EspecialidadService {
     @Transactional
     public void eliminar(Long id) {
         if (!especialidadRepository.existsById(id)) {
-            throw new RuntimeException("No se encontró la especialidad para eliminar con ID: " + id);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No se encontró la especialidad para eliminar con ID: " + id);
         }
         especialidadRepository.deleteById(id);
     }
