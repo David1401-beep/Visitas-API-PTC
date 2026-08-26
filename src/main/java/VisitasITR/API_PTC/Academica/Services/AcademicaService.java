@@ -34,7 +34,13 @@ public class AcademicaService {
         return convertirEntityADto(entidad);
     }
 
+<<<<<<< HEAD
     @Transactional // Sobrescribe para operaciones de escritura
+=======
+    // Por defecto, los métodos de esta clase trabajan como operaciones de lectura.
+// Los métodos que modifican datos llevan su propio @Transactional.
+    @Transactional
+>>>>>>> 105d2b0ff415ec3d09ebf04fcf5026e07b9d64b4
     public AcademicaDTO guardar(AcademicaDTO dto) {
         if (academicaRepository.existsBySeccionIgnoreCase(dto.getSeccion())) {
             throw new ResponseStatusException(

@@ -1,5 +1,6 @@
 package VisitasITR.API_PTC.Estudiante.Entity;
 
+import VisitasITR.API_PTC.Usuarios.Entity.UsuariosEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,29 @@ public class EstudianteEntity {
     @Column(name = "EST_SECCION", nullable = false, length = 10)
     private String estSeccion;
 
+<<<<<<< HEAD
     @Column(name = "EST_ESTADO", nullable = false, length = 20)
     private String estEstado;
 }
+=======
+    @Column(name = "EST_ESPECIALIDAD", nullable = false, length = 60)
+    private String estEspecialidad;
+
+    @Column(name = "EST_CODIGO", nullable = false, length = 20, unique = true)
+    private String estCodigo;
+
+    @Column(name = "ID_ACADEMICA", nullable = false)
+    private Long idAcademica;
+
+    @Column(name = "ID_GRADO", nullable = false)
+    private Long idGrado;
+
+    /**
+     * Usuario que contiene el correo institucional del estudiante y que utiliza
+     * el encargado para iniciar sesión en la aplicación de padres.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USUARIO_ESTUDIANTE", nullable = false)
+    private UsuariosEntity usuarioEstudiante;
+}
+>>>>>>> 105d2b0ff415ec3d09ebf04fcf5026e07b9d64b4

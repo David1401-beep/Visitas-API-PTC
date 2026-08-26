@@ -10,9 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+// Indica que esta clase es un controlador REST.
+// Recibe peticiones HTTP y devuelve respuestas, normalmente en formato JSON.
 @RestController
+// Define la ruta base para todos los endpoints de este controlador.
 @RequestMapping("/api/v1/academicas")
+// Lombok genera automáticamente un constructor con los atributos final.
+// Esto permite inyectar AcademicaService sin escribir el constructor manualmente.
 @RequiredArgsConstructor
 public class AcademicaController {
 
@@ -59,3 +63,6 @@ public class AcademicaController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Registro académico eliminado exitosamente.", null));
     }
 }
+
+//¿Por qué llamas al Service desde el Controller y no directamente al Repository?
+//dwRespuesta: “Porque estoy separando responsabilidades. El Controller recibe las peticiones HTTP, el Service maneja la lógica del negocio y el Repository se encarga del acceso a la base de datos. Así el código queda más ordenado y mantenible.”

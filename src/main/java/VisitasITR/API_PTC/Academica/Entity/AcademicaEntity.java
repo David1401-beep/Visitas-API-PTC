@@ -12,6 +12,7 @@ import lombok.*;
 public class AcademicaEntity {
 
     @Id
+    // Es una notacion que este identificador se genera automatico, se crea un id unicow
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ACADEMICA")
     private Long idAcademica;
