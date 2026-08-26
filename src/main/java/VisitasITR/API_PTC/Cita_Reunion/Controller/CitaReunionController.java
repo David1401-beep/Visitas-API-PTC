@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/citas-reunion")
+@RequestMapping("/api/v1/citas-reuniones")
 @RequiredArgsConstructor
 public class CitaReunionController {
 
