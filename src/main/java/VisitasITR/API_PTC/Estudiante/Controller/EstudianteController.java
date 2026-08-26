@@ -1,8 +1,9 @@
 package VisitasITR.API_PTC.Estudiante.Controller;
 
+import VisitasITR.API_PTC.Estudiante.Services.EstudianteServices;
 import VisitasITR.API_PTC.Response.ApiResponse;
 import VisitasITR.API_PTC.Estudiante.DTO.EstudianteDTO;
-import VisitasITR.API_PTC.Estudiante.Services.EstudianteService;
+import VisitasITR.API_PTC.Estudiante.Services.EstudianteServices;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EstudianteController {
 
-    private final EstudianteService estudianteService;
+    private final EstudianteServices estudianteService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<EstudianteDTO>>> listar() {

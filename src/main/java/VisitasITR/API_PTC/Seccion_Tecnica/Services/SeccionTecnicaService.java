@@ -17,87 +17,43 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SeccionTecnicaService {
 
-    private final SeccionTecnicaRepository seccionTecnicaRepository;
+    private final SeccionTecnicaRepository repository;
 
-    public List<SeccionTecnicaDTO> listarTodos() {
-        return seccionTecnicaRepository.findAll()
-                .stream()
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+    public List<SeccionTecnicaDTO> obtenerTodos() {
+        return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public SeccionTecnicaDTO buscarPorId(Long id) {
-        SeccionTecnicaEntity tecnica = seccionTecnicaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Sección técnica no encontrada con ID: " + id));
-        return convertirADto(tecnica);
+    public SeccionTecnicaDTO obtenerPorId(Long id) {
+        return toDTO(repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sección Técnica no encontrada: " + id)));
     }
 
     @Transactional
-    public SeccionTecnicaDTO guardar(SeccionTecnicaDTO dto) {
-        String tecnicaLimpia = dto.getTecnica().trim().toUpperCase();
-
-        if (seccionTecnicaRepository.existsByTecnicaIgnoreCase(tecnicaLimpia)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "La sección técnica '" + tecnicaLimpia + "' ya se encuentra registrada.");
+    public SeccionTecnicaDTO crear(SeccionTecnicaDTO dto) {
+        if (repository.existsByTecnica(dto.getTecnica())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La sección técnica ya existe.");
         }
-
-        SeccionTecnicaEntity tecnica = SeccionTecnicaEntity.builder()
-                .tecnica(tecnicaLimpia)
-                .build();
-
-        return convertirADto(seccionTecnicaRepository.save(tecnica));
+        SeccionTecnicaEntity entity = SeccionTecnicaEntity.builder().tecnica(dto.getTecnica()).build();
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public SeccionTecnicaDTO actualizar(Long id, SeccionTecnicaDTO dto) {
-        SeccionTecnicaEntity tecnica = seccionTecnicaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Sección técnica no encontrada con ID: " + id));
-
-        String tecnicaLimpia = dto.getTecnica().trim().toUpperCase();
-
-        if (seccionTecnicaRepository.existsByTecnicaIgnoreCaseAndIdTecnicaNot(tecnicaLimpia, id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "La sección técnica '" + tecnicaLimpia + "' ya existe en otro registro.");
-        }
-
-        tecnica.setTecnica(tecnicaLimpia);
-        return convertirADto(seccionTecnicaRepository.save(tecnica));
-    }
-
-    @Transactional
-    public SeccionTecnicaDTO actualizarParcial(Long id, SeccionTecnicaDTO dto) {
-        SeccionTecnicaEntity entidadExistente = seccionTecnicaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Sección técnica no encontrada con ID: " + id));
-
-        if (dto.getTecnica() != null && !dto.getTecnica().isBlank()) {
-            String tecnicaLimpia = dto.getTecnica().trim().toUpperCase();
-
-            if (seccionTecnicaRepository.existsByTecnicaIgnoreCaseAndIdTecnicaNot(tecnicaLimpia, id)) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT, "La sección técnica '" + tecnicaLimpia + "' ya existe en otro registro.");
-            }
-            entidadExistente.setTecnica(tecnicaLimpia);
-        }
-
-        return convertirADto(seccionTecnicaRepository.save(entidadExistente));
+        SeccionTecnicaEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sección Técnica no encontrada: " + id));
+        entity.setTecnica(dto.getTecnica());
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public void eliminar(Long id) {
-        if (!seccionTecnicaRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "No se encontró la sección técnica para eliminar con ID: " + id);
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sección Técnica no encontrada: " + id);
         }
-        seccionTecnicaRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private SeccionTecnicaDTO convertirADto(SeccionTecnicaEntity entidad) {
-        return SeccionTecnicaDTO.builder()
-                .idTecnica(entidad.getIdTecnica())
-                .tecnica(entidad.getTecnica())
-                .build();
+    private SeccionTecnicaDTO toDTO(SeccionTecnicaEntity entity) {
+        return SeccionTecnicaDTO.builder().idTecnica(entity.getIdTecnica()).tecnica(entity.getTecnica()).build();
     }
 }

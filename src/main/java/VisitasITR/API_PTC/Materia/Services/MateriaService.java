@@ -17,93 +17,51 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class MateriaService {
 
-    private final MateriaRepository materiaRepository;
+    private final MateriaRepository repository;
 
-    public List<MateriaDTO> listarTodos() {
-        return materiaRepository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<MateriaDTO> obtenerTodos() {
+        return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public MateriaDTO buscarPorId(Long id) {
-        MateriaEntity entity = materiaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Materia no encontrada con ID: " + id));
-        return convertirADTO(entity);
+    public MateriaDTO obtenerPorId(Long id) {
+        return toDTO(repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Materia no encontrada: " + id)));
     }
 
     @Transactional
-    public MateriaDTO guardar(MateriaDTO dto) {
-        String nombreLimpio = dto.getNombre().trim().toUpperCase();
-
-        if (materiaRepository.existsByNombreIgnoreCase(nombreLimpio)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "La materia '" + nombreLimpio + "' ya se encuentra registrada.");
+    public MateriaDTO crear(MateriaDTO dto) {
+        if (repository.existsByMatNombre(dto.getMatNombre())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La materia ya existe.");
         }
-
         MateriaEntity entity = MateriaEntity.builder()
-                .nombre(nombreLimpio)
-                .tipo(dto.getTipo().trim().toUpperCase())
+                .matNombre(dto.getMatNombre())
+                .matTipo(dto.getMatTipo())
                 .build();
-
-        return convertirADTO(materiaRepository.save(entity));
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public MateriaDTO actualizar(Long id, MateriaDTO dto) {
-        MateriaEntity entity = materiaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Materia no encontrada con ID: " + id));
-
-        String nombreLimpio = dto.getNombre().trim().toUpperCase();
-
-        if (materiaRepository.existsByNombreIgnoreCaseAndIdMateriaNot(nombreLimpio, id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "La materia '" + nombreLimpio + "' ya existe en otro registro.");
-        }
-
-        entity.setNombre(nombreLimpio);
-        entity.setTipo(dto.getTipo().trim().toUpperCase());
-
-        return convertirADTO(materiaRepository.save(entity));
-    }
-
-    @Transactional
-    public MateriaDTO actualizarParcial(Long id, MateriaDTO dto) {
-        MateriaEntity entity = materiaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Materia no encontrada con ID: " + id));
-
-        if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
-            String nombreLimpio = dto.getNombre().trim().toUpperCase();
-            if (materiaRepository.existsByNombreIgnoreCaseAndIdMateriaNot(nombreLimpio, id)) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT, "La materia '" + nombreLimpio + "' ya existe en otro registro.");
-            }
-            entity.setNombre(nombreLimpio);
-        }
-
-        if (dto.getTipo() != null && !dto.getTipo().isBlank()) {
-            entity.setTipo(dto.getTipo().trim().toUpperCase());
-        }
-
-        return convertirADTO(materiaRepository.save(entity));
+        MateriaEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Materia no encontrada: " + id));
+        entity.setMatNombre(dto.getMatNombre());
+        entity.setMatTipo(dto.getMatTipo());
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public void eliminar(Long id) {
-        if (!materiaRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Materia no encontrada para eliminar con ID: " + id);
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Materia no encontrada: " + id);
         }
-        materiaRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private MateriaDTO convertirADTO(MateriaEntity entity) {
+    private MateriaDTO toDTO(MateriaEntity entity) {
         return MateriaDTO.builder()
                 .idMateria(entity.getIdMateria())
-                .nombre(entity.getNombre())
-                .tipo(entity.getTipo())
+                .matNombre(entity.getMatNombre())
+                .matTipo(entity.getMatTipo())
                 .build();
     }
 }

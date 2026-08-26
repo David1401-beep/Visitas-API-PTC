@@ -20,158 +20,64 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class GradoService {
 
-    private final GradoRepository gradoRepository;
+    private final GradoRepository repository;
     private final NivelRepository nivelRepository;
-    private final SeccionTecnicaRepository seccionTecnicaRepository;
+    private final SeccionTecnicaRepository tecnicaRepository;
     private final EspecialidadRepository especialidadRepository;
 
-    public List<GradoDTO> listarTodos() {
-        return gradoRepository.findAll()
-                .stream()
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+    public List<GradoDTO> obtenerTodos() {
+        return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public GradoDTO buscarPorId(Long id) {
-        GradoEntity grado = gradoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Grado no encontrado con ID: " + id));
-        return convertirADto(grado);
+    public GradoDTO obtenerPorId(Long id) {
+        return toDTO(repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Grado no encontrado: " + id)));
     }
 
     @Transactional
-    public GradoDTO guardar(GradoDTO dto) {
-        String gradoLimpio = dto.getGrado().trim();
-
-        if (gradoRepository.existsByGradoIgnoreCaseAndNivelIdNivel(gradoLimpio, dto.getIdNivel())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El grado '" + gradoLimpio + "' ya existe para el nivel especificado.");
-        }
-
-        var nivel = nivelRepository.findById(dto.getIdNivel())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Nivel asociado no encontrado con ID: " + dto.getIdNivel()));
-
-        var tecnica = dto.getIdTecnica() != null
-                ? seccionTecnicaRepository.findById(dto.getIdTecnica())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Sección técnica asociada no encontrada con ID: " + dto.getIdTecnica()))
-                : null;
-
-        var especialidad = dto.getIdEspecialidad() != null
-                ? especialidadRepository.findById(dto.getIdEspecialidad())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Especialidad asociada no encontrada con ID: " + dto.getIdEspecialidad()))
-                : null;
-
-        GradoEntity grado = GradoEntity.builder()
-                .grado(gradoLimpio)
-                .nivel(nivel)
-                .seccionTecnica(tecnica)
-                .especialidad(especialidad)
+    public GradoDTO crear(GradoDTO dto) {
+        GradoEntity entity = GradoEntity.builder()
+                .grado(dto.getGrado())
+                .nivel(nivelRepository.findById(dto.getIdNivel())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nivel no encontrado")))
+                .seccionTecnica(dto.getIdTecnica() != null ? tecnicaRepository.findById(dto.getIdTecnica()).orElse(null) : null)
+                .especialidad(dto.getIdEspecialidad() != null ? especialidadRepository.findById(dto.getIdEspecialidad()).orElse(null) : null)
                 .build();
-
-        return convertirADto(gradoRepository.save(grado));
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public GradoDTO actualizar(Long id, GradoDTO dto) {
-        GradoEntity grado = gradoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Grado no encontrado con ID: " + id));
+        GradoEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Grado no encontrado: " + id));
 
-        String gradoLimpio = dto.getGrado().trim();
+        entity.setGrado(dto.getGrado());
+        entity.setNivel(nivelRepository.findById(dto.getIdNivel())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nivel no encontrado")));
+        entity.setSeccionTecnica(dto.getIdTecnica() != null ? tecnicaRepository.findById(dto.getIdTecnica()).orElse(null) : null);
+        entity.setEspecialidad(dto.getIdEspecialidad() != null ? especialidadRepository.findById(dto.getIdEspecialidad()).orElse(null) : null);
 
-        if (gradoRepository.existsByGradoIgnoreCaseAndNivelIdNivelAndIdGradoNot(gradoLimpio, dto.getIdNivel(), id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El grado '" + gradoLimpio + "' ya existe para el nivel especificado.");
-        }
-
-        var nivel = nivelRepository.findById(dto.getIdNivel())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Nivel asociado no encontrado con ID: " + dto.getIdNivel()));
-
-        var tecnica = dto.getIdTecnica() != null
-                ? seccionTecnicaRepository.findById(dto.getIdTecnica())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Sección técnica asociada no encontrada con ID: " + dto.getIdTecnica()))
-                : null;
-
-        var especialidad = dto.getIdEspecialidad() != null
-                ? especialidadRepository.findById(dto.getIdEspecialidad())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Especialidad asociada no encontrada con ID: " + dto.getIdEspecialidad()))
-                : null;
-
-        grado.setGrado(gradoLimpio);
-        grado.setNivel(nivel);
-        grado.setSeccionTecnica(tecnica);
-        grado.setEspecialidad(especialidad);
-
-        return convertirADto(gradoRepository.save(grado));
-    }
-
-    @Transactional
-    public GradoDTO actualizarGrado(Long id, GradoDTO dto) {
-        GradoEntity entidadExistente = gradoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Grado no encontrado con ID: " + id));
-
-        String nuevoNombre = dto.getGrado() != null && !dto.getGrado().isBlank()
-                ? dto.getGrado().trim()
-                : entidadExistente.getGrado();
-
-        Long nuevoNivelId = dto.getIdNivel() != null
-                ? dto.getIdNivel()
-                : entidadExistente.getNivel().getIdNivel();
-
-        if (gradoRepository.existsByGradoIgnoreCaseAndNivelIdNivelAndIdGradoNot(nuevoNombre, nuevoNivelId, id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El grado '" + nuevoNombre + "' ya existe para el nivel especificado.");
-        }
-
-        if (dto.getGrado() != null && !dto.getGrado().isBlank()) {
-            entidadExistente.setGrado(nuevoNombre);
-        }
-        if (dto.getIdNivel() != null) {
-            entidadExistente.setNivel(nivelRepository.findById(dto.getIdNivel())
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "Nivel asociado no encontrado con ID: " + dto.getIdNivel())));
-        }
-        if (dto.getIdTecnica() != null) {
-            entidadExistente.setSeccionTecnica(
-                    seccionTecnicaRepository.findById(dto.getIdTecnica())
-                            .orElseThrow(() -> new ResponseStatusException(
-                                    HttpStatus.NOT_FOUND, "Sección técnica asociada no encontrada con ID: " + dto.getIdTecnica()))
-            );
-        }
-        if (dto.getIdEspecialidad() != null) {
-            entidadExistente.setEspecialidad(
-                    especialidadRepository.findById(dto.getIdEspecialidad())
-                            .orElseThrow(() -> new ResponseStatusException(
-                                    HttpStatus.NOT_FOUND, "Especialidad asociada no encontrada con ID: " + dto.getIdEspecialidad()))
-            );
-        }
-
-        return convertirADto(gradoRepository.save(entidadExistente));
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public void eliminar(Long id) {
-        if (!gradoRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "No se encontró el grado para eliminar con ID: " + id);
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Grado no encontrado: " + id);
         }
-        gradoRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private GradoDTO convertirADto(GradoEntity grado) {
+    private GradoDTO toDTO(GradoEntity entity) {
         return GradoDTO.builder()
-                .idGrado(grado.getIdGrado())
-                .grado(grado.getGrado())
-                .idNivel(grado.getNivel().getIdNivel())
-                .idTecnica(grado.getSeccionTecnica() != null ? grado.getSeccionTecnica().getIdTecnica() : null)
-                .idEspecialidad(grado.getEspecialidad() != null ? grado.getEspecialidad().getIdEspecialidad() : null)
+                .idGrado(entity.getIdGrado())
+                .grado(entity.getGrado())
+                .idNivel(entity.getNivel().getIdNivel())
+                .nombreNivel(entity.getNivel().getNivel())
+                .idTecnica(entity.getSeccionTecnica() != null ? entity.getSeccionTecnica().getIdTecnica() : null)
+                .nombreTecnica(entity.getSeccionTecnica() != null ? entity.getSeccionTecnica().getTecnica() : null)
+                .idEspecialidad(entity.getEspecialidad() != null ? entity.getEspecialidad().getIdEspecialidad() : null)
+                .nombreEspecialidad(entity.getEspecialidad() != null ? entity.getEspecialidad().getEspecialidad() : null)
                 .build();
     }
 }

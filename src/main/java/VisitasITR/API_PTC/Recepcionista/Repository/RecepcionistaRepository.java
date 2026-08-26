@@ -6,8 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RecepcionistaRepository extends JpaRepository<RecepcionistaEntity, Long> {
-
     boolean existsByRecCorreo(String recCorreo);
-
     boolean existsByRecCorreoAndIdRecepcionistaNot(String recCorreo, Long idRecepcionista);
 }

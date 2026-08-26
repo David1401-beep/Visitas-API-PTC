@@ -3,81 +3,71 @@ package VisitasITR.API_PTC.Encargado.Services;
 import VisitasITR.API_PTC.Encargado.DTO.EncargadoDTO;
 import VisitasITR.API_PTC.Encargado.Entity.EncargadoEntity;
 import VisitasITR.API_PTC.Encargado.Reposity.EncargadoRepository;
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EncargadoService {
 
-    private final EncargadoRepository encargadoRepository;
+    private final EncargadoRepository repository;
 
-    public EncargadoService(EncargadoRepository encargadoRepository) {
-        this.encargadoRepository = encargadoRepository;
-    }
-
-    @Transactional(readOnly = true)
     public List<EncargadoDTO> obtenerTodos() {
-        return encargadoRepository.findAll()
-                .stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+        return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     public EncargadoDTO obtenerPorId(Long id) {
-        EncargadoEntity entity = encargadoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Encargado no encontrado con ID: " + id));
-        return convertirADTO(entity);
+        return toDTO(repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Encargado no encontrado: " + id)));
     }
 
     @Transactional
     public EncargadoDTO crear(EncargadoDTO dto) {
+        if (dto.getEncTelefono() != null && repository.existsByEncTelefono(dto.getEncTelefono())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El teléfono ya está registrado.");
+        }
         EncargadoEntity entity = EncargadoEntity.builder()
-                .nombre(dto.getNombre())
-                .apellido(dto.getApellido())
-                .telefono(dto.getTelefono())
-                .tipo(dto.getTipo())
+                .encNombre(dto.getEncNombre())
+                .encApellido(dto.getEncApellido())
+                .encTelefono(dto.getEncTelefono())
+                .encTipo(dto.getEncTipo())
                 .build();
-
-        EncargadoEntity guardado = encargadoRepository.save(entity);
-        return convertirADTO(guardado);
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public EncargadoDTO actualizar(Long id, EncargadoDTO dto) {
-        EncargadoEntity entity = encargadoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Encargado no encontrado con ID: " + id));
-
-        entity.setNombre(dto.getNombre());
-        entity.setApellido(dto.getApellido());
-        entity.setTelefono(dto.getTelefono());
-        entity.setTipo(dto.getTipo());
-
-        EncargadoEntity actualizado = encargadoRepository.save(entity);
-        return convertirADTO(actualizado);
+        EncargadoEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Encargado no encontrado: " + id));
+        entity.setEncNombre(dto.getEncNombre());
+        entity.setEncApellido(dto.getEncApellido());
+        entity.setEncTelefono(dto.getEncTelefono());
+        entity.setEncTipo(dto.getEncTipo());
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public void eliminar(Long id) {
-        if (!encargadoRepository.existsById(id)) {
-            throw new RuntimeException("Encargado no encontrado con ID: " + id);
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Encargado no encontrado: " + id);
         }
-        encargadoRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private EncargadoDTO convertirADTO(EncargadoEntity entity) {
+    private EncargadoDTO toDTO(EncargadoEntity entity) {
         return EncargadoDTO.builder()
                 .idEncargado(entity.getIdEncargado())
-                .nombre(entity.getNombre())
-                .apellido(entity.getApellido())
-                .telefono(entity.getTelefono())
-                .tipo(entity.getTipo())
+                .encNombre(entity.getEncNombre())
+                .encApellido(entity.getEncApellido())
+                .encTelefono(entity.getEncTelefono())
+                .encTipo(entity.getEncTipo())
                 .build();
     }
-
-
 }

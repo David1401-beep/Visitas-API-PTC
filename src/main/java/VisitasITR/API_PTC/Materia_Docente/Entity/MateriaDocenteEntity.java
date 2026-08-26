@@ -6,10 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(
-        name = "MATERIA_DOCENTE",
-        uniqueConstraints = @UniqueConstraint(name = "MATERIA_DOCENTE_DOCENTE_UQ", columnNames = "ID_DOCENTE")
-)
+@Table(name = "MATERIA_DOCENTE")
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,6 +23,6 @@ public class MateriaDocenteEntity {
     private MateriaEntity materia;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_DOCENTE", nullable = false, unique = true)
+    @JoinColumn(name = "ID_DOCENTE", nullable = false)
     private DocenteEntity docente;
 }

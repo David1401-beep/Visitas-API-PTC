@@ -1,28 +1,44 @@
 package VisitasITR.API_PTC.Estudiante.DTO;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class EstudianteDTO {
+
     private Long idEstudiante;
 
-    @NotBlank(message = "Los nombres son obligatorios")
-    private String estNombres;
+    @NotBlank(message = "Nombre obligatorio")
+    private String estNombre;
 
-    @NotBlank(message = "Los apellidos son obligatorios")
-    private String estApellidos;
+    @NotBlank(message = "Apellido obligatorio")
+    private String estApellido;
 
-    @NotBlank(message = "El NIE es obligatorio")
-    private String estNie;
-
+    @NotBlank(message = "Correo obligatorio")
+    @Email(message = "Correo inválido")
     private String estCorreo;
 
-    @NotBlank(message = "El grado es obligatorio")
+    private String estPassword;
+
+    @NotBlank(message = "Grado obligatorio")
     private String estGrado;
 
-    @NotBlank(message = "La sección es obligatoria")
     private String estSeccion;
+    private String estEspecialidad;
 
-    private String estEstado;
+    @NotBlank(message = "Código obligatorio")
+    private String estCodigo;
+
+    private String estRol;
+
+    @NotNull(message = "ID de Académica obligatorio")
+    private Long idAcademica;
+    private String nombreAcademica;
+
+    @NotNull(message = "ID de Grado obligatorio")
+    private Long idGrado;
+    private String nombreGrado;
 }

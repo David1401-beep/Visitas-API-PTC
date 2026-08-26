@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(
-        name = "MATERIA",
-        uniqueConstraints = @UniqueConstraint(name = "MATERIA_NOMBRE_UQ", columnNames = "MAT_NOMBRE")
-)
+@Table(name = "MATERIA")
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,9 +16,9 @@ public class MateriaEntity {
     @Column(name = "ID_MATERIA")
     private Long idMateria;
 
-    @Column(name = "MAT_NOMBRE", nullable = false, length = 80, unique = true)
-    private String nombre;
+    @Column(name = "MAT_NOMBRE", nullable = false, unique = true, length = 80)
+    private String matNombre;
 
     @Column(name = "MAT_TIPO", nullable = false, length = 20)
-    private String tipo;
+    private String matTipo;
 }

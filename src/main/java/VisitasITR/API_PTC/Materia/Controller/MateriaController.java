@@ -16,42 +16,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MateriaController {
 
-    private final MateriaService materiaService;
+    private final MateriaService service;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<MateriaDTO>>> listar() {
-        List<MateriaDTO> lista = materiaService.listarTodos();
-        return ResponseEntity.ok(new ApiResponse<>(true, "Lista de materias obtenida exitosamente.", lista));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Materias obtenidas", service.obtenerTodos()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MateriaDTO>> obtenerPorId(@PathVariable Long id) {
-        MateriaDTO dto = materiaService.buscarPorId(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Materia encontrada con éxito.", dto));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Materia obtenida", service.obtenerPorId(id)));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<MateriaDTO>> crear(@Valid @RequestBody MateriaDTO dto) {
-        MateriaDTO nueva = materiaService.guardar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "Materia registrada con éxito.", nueva));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Materia creada", service.crear(dto)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MateriaDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody MateriaDTO dto) {
-        MateriaDTO actualizada = materiaService.actualizar(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Materia actualizada completamente.", actualizada));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<MateriaDTO>> actualizarParcial(@PathVariable Long id, @RequestBody MateriaDTO dto) {
-        MateriaDTO actualizada = materiaService.actualizarParcial(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Materia actualizada parcialmente.", actualizada));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Materia actualizada", service.actualizar(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        materiaService.eliminar(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Materia eliminada correctamente.", null));
+        service.eliminar(id);
+        return ResponseEntity.ok(new ApiResponse<>(true,"Materia eliminada", null));
     }
 }

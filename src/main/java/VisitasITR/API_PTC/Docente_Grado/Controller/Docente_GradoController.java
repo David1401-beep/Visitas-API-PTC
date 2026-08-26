@@ -12,71 +12,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/docente-grados")
+@RequestMapping("/api/v1/docente-grado")
 @RequiredArgsConstructor
 public class Docente_GradoController {
 
-    private final Docente_GradoServices docenteGradoService;
+    private final Docente_GradoServices service;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Docente_GradoDTO>>> obtenerTodos() {
-        List<Docente_GradoDTO> lista = docenteGradoService.obtenerTodos();
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Lista de asignaciones docente-grado obtenida exitosamente.",
-                lista
-        ));
+    public ResponseEntity<ApiResponse<List<Docente_GradoDTO>>> listar() {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Asignaciones docente-grado obtenidas", service.obtenerTodos()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Docente_GradoDTO>> obtenerPorId(@PathVariable Long id) {
-        Docente_GradoDTO dto = docenteGradoService.obtenerPorId(id);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Asignación docente-grado encontrada con éxito.",
-                dto
-        ));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Asignación obtenida", service.obtenerPorId(id)));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Docente_GradoDTO>> guardar(@Valid @RequestBody Docente_GradoDTO dto) {
-        Docente_GradoDTO nuevo = docenteGradoService.guardar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(true, "Asignación docente-grado registrada con éxito.", nuevo)
-        );
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Docente_GradoDTO>> actualizar(
-            @PathVariable Long id,
-            @Valid @RequestBody Docente_GradoDTO dto
-    ) {
-        Docente_GradoDTO actualizado = docenteGradoService.actualizar(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Asignación docente-grado actualizada completamente.",
-                actualizado
-        ));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<Docente_GradoDTO>> actualizarParcial(
-            @PathVariable Long id,
-            @RequestBody Docente_GradoDTO dto
-    ) {
-        Docente_GradoDTO actualizado = docenteGradoService.actualizarParcial(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Asignación docente-grado actualizada parcialmente.",
-                actualizado
-        ));
+    public ResponseEntity<ApiResponse<Docente_GradoDTO>> crear(@Valid @RequestBody Docente_GradoDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Asignación creada", service.crear(dto)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        docenteGradoService.eliminar(id);
-        return ResponseEntity.ok(
-                new ApiResponse<>(true, "Asignación docente-grado eliminada exitosamente.", null)
-        );
+        service.eliminar(id);
+        return ResponseEntity.ok(new ApiResponse<>(true,"Asignatura eliminada correctamente", null));
     }
 }

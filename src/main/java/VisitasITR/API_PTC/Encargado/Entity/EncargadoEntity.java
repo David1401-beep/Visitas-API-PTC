@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(
-        name = "ENCARGADO",
-        uniqueConstraints = @UniqueConstraint(name = "ENCARGADO_TELEFONO_UQ", columnNames = "ENC_TELEFONO")
-)
+@Table(name = "ENCARGADO")
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,14 +17,14 @@ public class EncargadoEntity {
     private Long idEncargado;
 
     @Column(name = "ENC_NOMBRE", nullable = false, length = 50)
-    private String nombre;
+    private String encNombre;
 
     @Column(name = "ENC_APELLIDO", nullable = false, length = 50)
-    private String apellido;
+    private String encApellido;
 
-    @Column(name = "ENC_TELEFONO", length = 20, unique = true)
-    private String telefono;
+    @Column(name = "ENC_TELEFONO", unique = true, length = 20)
+    private String encTelefono;
 
     @Column(name = "ENC_TIPO", nullable = false, length = 30)
-    private String tipo;
+    private String encTipo;
 }

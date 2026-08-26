@@ -6,13 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(
-        name = "ESTUDIANTE_ENCARGADO",
-        uniqueConstraints = @UniqueConstraint(
-                name = "UQ_ESTUDIANTE_ENCARGADO",
-                columnNames = {"ID_ESTUDIANTE", "ID_ENCARGADO"}
-        )
-)
+@Table(name = "ESTUDIANTE_ENCARGADO")
 @Data
 @Builder
 @NoArgsConstructor

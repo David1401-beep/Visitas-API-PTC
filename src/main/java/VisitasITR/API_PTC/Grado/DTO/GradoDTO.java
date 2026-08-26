@@ -2,25 +2,25 @@ package VisitasITR.API_PTC.Grado.DTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class GradoDTO {
-
     private Long idGrado;
 
     @NotBlank(message = "El nombre del grado es obligatorio")
-    @Size(max = 40, message = "El grado no puede superar los 40 caracteres")
     private String grado;
 
     @NotNull(message = "El ID de Nivel es obligatorio")
     private Long idNivel;
+    private String nombreNivel;
 
     private Long idTecnica;
+    private String nombreTecnica;
 
     private Long idEspecialidad;
+    private String nombreEspecialidad;
 }

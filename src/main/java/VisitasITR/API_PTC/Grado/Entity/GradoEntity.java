@@ -22,15 +22,15 @@ public class GradoEntity {
     @Column(name = "GRADO", nullable = false, length = 40)
     private String grado;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_NIVEL", nullable = false)
     private NivelEntity nivel;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_TECNICA")
     private SeccionTecnicaEntity seccionTecnica;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_ESPECIALIDAD")
     private EspecialidadEntity especialidad;
 }

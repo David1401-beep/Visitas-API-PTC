@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EncargadoRepository extends JpaRepository<EncargadoEntity, Long> {
+    boolean existsByEncTelefono(String encTelefono);
 }

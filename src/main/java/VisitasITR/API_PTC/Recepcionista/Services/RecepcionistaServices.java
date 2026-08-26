@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,75 +18,78 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class RecepcionistaServices {
 
-    private final RecepcionistaRepository recepcionistaRepository;
+    private final RecepcionistaRepository repository;
 
     public List<RecepcionistaDTO> obtenerTodos() {
-        return recepcionistaRepository.findAll().stream()
-                .map(this::convertirADTO)
+        return repository.findAll().stream()
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
     public RecepcionistaDTO obtenerPorId(Long id) {
-        RecepcionistaEntity entity = recepcionistaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Recepcionista no encontrado con ID: " + id));
-        return convertirADTO(entity);
+        RecepcionistaEntity entity = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recepcionista no encontrado: " + id));
+        return toDTO(entity);
     }
 
     @Transactional
     public RecepcionistaDTO crear(RecepcionistaDTO dto) {
-        if (recepcionistaRepository.existsByRecCorreo(dto.getRecCorreo())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El correo " + dto.getRecCorreo() + " ya está registrado.");
+        if (repository.existsByRecCorreo(dto.getRecCorreo())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo " + dto.getRecCorreo() + " ya existe.");
         }
-
         RecepcionistaEntity entity = RecepcionistaEntity.builder()
                 .recNombre(dto.getRecNombre())
                 .recApellido(dto.getRecApellido())
                 .recCorreo(dto.getRecCorreo())
-                .recPassword(dto.getRecPassword())
+                .recPassword(dto.getRecPassword() != null ? dto.getRecPassword() : "123456")
                 .recRol(dto.getRecRol() != null ? dto.getRecRol() : "RECEPCIONISTA")
                 .build();
-
-        return convertirADTO(recepcionistaRepository.save(entity));
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public RecepcionistaDTO actualizar(Long id, RecepcionistaDTO dto) {
-        RecepcionistaEntity entity = recepcionistaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Recepcionista no encontrado con ID: " + id));
+        RecepcionistaEntity entity = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recepcionista no encontrado: " + id));
 
-        if (recepcionistaRepository.existsByRecCorreoAndIdRecepcionistaNot(dto.getRecCorreo(), id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El correo " + dto.getRecCorreo() + " ya está registrado por otro usuario.");
+        if (repository.existsByRecCorreoAndIdRecepcionistaNot(dto.getRecCorreo(), id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está en uso.");
         }
 
         entity.setRecNombre(dto.getRecNombre());
         entity.setRecApellido(dto.getRecApellido());
         entity.setRecCorreo(dto.getRecCorreo());
-
         if (dto.getRecPassword() != null && !dto.getRecPassword().isBlank()) {
             entity.setRecPassword(dto.getRecPassword());
         }
+        return toDTO(repository.save(entity));
+    }
 
-        if (dto.getRecRol() != null) {
-            entity.setRecRol(dto.getRecRol());
-        }
+    @Transactional
+    public RecepcionistaDTO patch(Long id, Map<String, Object> updates) {
+        RecepcionistaEntity entity = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recepcionista no encontrado: " + id));
 
-        return convertirADTO(recepcionistaRepository.save(entity));
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "recNombre" -> entity.setRecNombre((String) value);
+                case "recApellido" -> entity.setRecApellido((String) value);
+                case "recCorreo" -> entity.setRecCorreo((String) value);
+                case "recPassword" -> entity.setRecPassword((String) value);
+            }
+        });
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public void eliminar(Long id) {
-        if (!recepcionistaRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Recepcionista no encontrado para eliminar con ID: " + id);
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recepcionista no encontrado: " + id);
         }
-        recepcionistaRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private RecepcionistaDTO convertirADTO(RecepcionistaEntity entity) {
+    private RecepcionistaDTO toDTO(RecepcionistaEntity entity) {
         return RecepcionistaDTO.builder()
                 .idRecepcionista(entity.getIdRecepcionista())
                 .recNombre(entity.getRecNombre())

@@ -6,8 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EspecialidadRepository extends JpaRepository<EspecialidadEntity, Long> {
-
-    boolean existsByEspecialidadIgnoreCase(String especialidad);
-
-    boolean existsByEspecialidadIgnoreCaseAndIdEspecialidadNot(String especialidad, Long idEspecialidad);
+    boolean existsByEspecialidad(String especialidad);
 }

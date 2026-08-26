@@ -1,8 +1,6 @@
 package VisitasITR.API_PTC.Materia_Docente.Services;
 
-import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
 import VisitasITR.API_PTC.Docente.Repository.DocenteRepository;
-import VisitasITR.API_PTC.Materia.Entity.MateriaEntity;
 import VisitasITR.API_PTC.Materia.Repository.MateriaRepository;
 import VisitasITR.API_PTC.Materia_Docente.DTO.MateriaDocenteDTO;
 import VisitasITR.API_PTC.Materia_Docente.Entity.MateriaDocenteEntity;
@@ -21,112 +19,43 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class MateriaDocenteService {
 
-    private final MateriaDocenteRepository materiaDocenteRepository;
+    private final MateriaDocenteRepository repository;
     private final MateriaRepository materiaRepository;
     private final DocenteRepository docenteRepository;
 
-    public List<MateriaDocenteDTO> listarTodos() {
-        return materiaDocenteRepository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+    public List<MateriaDocenteDTO> obtenerTodos() {
+        return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public MateriaDocenteDTO buscarPorId(Long id) {
-        MateriaDocenteEntity entity = materiaDocenteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Registro no encontrado con ID: " + id));
-        return convertirADTO(entity);
+    public MateriaDocenteDTO obtenerPorId(Long id) {
+        return toDTO(repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Asignación no encontrada: " + id)));
     }
 
     @Transactional
-    public MateriaDocenteDTO guardar(MateriaDocenteDTO dto) {
-        if (materiaDocenteRepository.existsByDocenteIdDocente(dto.getIdDocente())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El docente con ID " + dto.getIdDocente() + " ya tiene una materia asignada.");
-        }
-
-        MateriaEntity materia = materiaRepository.findById(dto.getIdMateria())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "La materia con ID " + dto.getIdMateria() + " no existe."));
-
-        DocenteEntity docente = docenteRepository.findById(dto.getIdDocente())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "El docente con ID " + dto.getIdDocente() + " no existe."));
-
+    public MateriaDocenteDTO crear(MateriaDocenteDTO dto) {
         MateriaDocenteEntity entity = MateriaDocenteEntity.builder()
-                .materia(materia)
-                .docente(docente)
+                .materia(materiaRepository.findById(dto.getIdMateria())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Materia no encontrada")))
+                .docente(docenteRepository.findById(dto.getIdDocente())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Docente no encontrado")))
                 .build();
-
-        return convertirADTO(materiaDocenteRepository.save(entity));
-    }
-
-    @Transactional
-    public MateriaDocenteDTO actualizar(Long id, MateriaDocenteDTO dto) {
-        MateriaDocenteEntity entity = materiaDocenteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Registro no encontrado con ID: " + id));
-
-        if (materiaDocenteRepository.existsByDocenteIdDocenteAndIdMateriaDocenteNot(dto.getIdDocente(), id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El docente con ID " + dto.getIdDocente() + " ya tiene una materia asignada.");
-        }
-
-        MateriaEntity materia = materiaRepository.findById(dto.getIdMateria())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Materia no encontrada con ID: " + dto.getIdMateria()));
-
-        DocenteEntity docente = docenteRepository.findById(dto.getIdDocente())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Docente no encontrado con ID: " + dto.getIdDocente()));
-
-        entity.setMateria(materia);
-        entity.setDocente(docente);
-
-        return convertirADTO(materiaDocenteRepository.save(entity));
-    }
-
-    @Transactional
-    public MateriaDocenteDTO actualizarParcial(Long id, MateriaDocenteDTO dto) {
-        MateriaDocenteEntity entity = materiaDocenteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Registro no encontrado con ID: " + id));
-
-        if (dto.getIdDocente() != null) {
-            if (materiaDocenteRepository.existsByDocenteIdDocenteAndIdMateriaDocenteNot(dto.getIdDocente(), id)) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT, "El docente con ID " + dto.getIdDocente() + " ya tiene una materia asignada.");
-            }
-            DocenteEntity docente = docenteRepository.findById(dto.getIdDocente())
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "Docente no encontrado con ID: " + dto.getIdDocente()));
-            entity.setDocente(docente);
-        }
-
-        if (dto.getIdMateria() != null) {
-            MateriaEntity materia = materiaRepository.findById(dto.getIdMateria())
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "Materia no encontrada con ID: " + dto.getIdMateria()));
-            entity.setMateria(materia);
-        }
-
-        return convertirADTO(materiaDocenteRepository.save(entity));
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public void eliminar(Long id) {
-        if (!materiaDocenteRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Registro no encontrado para eliminar con ID: " + id);
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Asignación no encontrada: " + id);
         }
-        materiaDocenteRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private MateriaDocenteDTO convertirADTO(MateriaDocenteEntity entity) {
+    private MateriaDocenteDTO toDTO(MateriaDocenteEntity entity) {
         return MateriaDocenteDTO.builder()
                 .idMateriaDocente(entity.getIdMateriaDocente())
                 .idMateria(entity.getMateria().getIdMateria())
-                .nombreMateria(entity.getMateria().getNombre())
+                .nombreMateria(entity.getMateria().getMatNombre())
                 .idDocente(entity.getDocente().getIdDocente())
                 .nombreDocente(entity.getDocente().getDocNombre() + " " + entity.getDocente().getDocApellido())
                 .build();

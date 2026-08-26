@@ -16,42 +16,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GradoController {
 
-    private final GradoService gradoService;
+    private final GradoService service;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<GradoDTO>>> listar() {
-        List<GradoDTO> lista = gradoService.listarTodos();
-        return ResponseEntity.ok(new ApiResponse<>(true, "Lista de grados obtenida exitosamente.", lista));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Grados obtenidos", service.obtenerTodos()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<GradoDTO>> obtenerPorId(@PathVariable Long id) {
-        GradoDTO dto = gradoService.buscarPorId(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Grado encontrado con éxito.", dto));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Grado obtenido", service.obtenerPorId(id)));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<GradoDTO>> crear(@Valid @RequestBody GradoDTO dto) {
-        GradoDTO nuevo = gradoService.guardar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "Grado registrado con éxito.", nuevo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Grado creado", service.crear(dto)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<GradoDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody GradoDTO dto) {
-        GradoDTO actualizado = gradoService.actualizar(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Grado actualizado completamente.", actualizado));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<GradoDTO>> actualizarGrado(@PathVariable Long id, @RequestBody GradoDTO dto) {
-        GradoDTO actualizado = gradoService.actualizarGrado(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Grado actualizado parcialmente con éxito.", actualizado));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Grado actualizado", service.actualizar(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        gradoService.eliminar(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Grado eliminado exitosamente.", null));
+        service.eliminar(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Grado eliminada", null));
     }
 }

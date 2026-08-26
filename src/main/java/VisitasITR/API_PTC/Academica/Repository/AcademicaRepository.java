@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AcademicaRepository extends JpaRepository<AcademicaEntity, Long> {
-
-    boolean existsBySeccionIgnoreCase(String seccion);
-    boolean existsBySeccionIgnoreCaseAndIdAcademicaNot(String seccion, Long idAcademica);
+    boolean existsByAcademica(String academica);
 }

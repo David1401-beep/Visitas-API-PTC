@@ -6,8 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SeccionTecnicaRepository extends JpaRepository<SeccionTecnicaEntity, Long> {
-
-    boolean existsByTecnicaIgnoreCase(String tecnica);
-
-    boolean existsByTecnicaIgnoreCaseAndIdTecnicaNot(String tecnica, Long idTecnica);
+    boolean existsByTecnica(String tecnica);
 }

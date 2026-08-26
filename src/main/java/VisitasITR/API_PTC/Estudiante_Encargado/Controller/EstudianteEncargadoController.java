@@ -12,71 +12,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/estudiante-encargados")
+@RequestMapping("/api/v1/estudiante-encargado")
 @RequiredArgsConstructor
 public class EstudianteEncargadoController {
 
-    private final EstudianteEncargadoService estudianteEncargadoService;
+    private final EstudianteEncargadoService service;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<EstudianteEncargadoDTO>>> obtenerTodos() {
-        List<EstudianteEncargadoDTO> lista = estudianteEncargadoService.obtenerTodos();
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Lista de asignaciones obtenida exitosamente.",
-                lista
-        ));
+    public ResponseEntity<ApiResponse<List<EstudianteEncargadoDTO>>> listar() {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Relaciones obtenidas", service.obtenerTodos()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<EstudianteEncargadoDTO>> obtenerPorId(@PathVariable Long id) {
-        EstudianteEncargadoDTO dto = estudianteEncargadoService.obtenerPorId(id);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Asignación encontrada con éxito.",
-                dto
-        ));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Relación obtenida", service.obtenerPorId(id)));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<EstudianteEncargadoDTO>> guardar(@Valid @RequestBody EstudianteEncargadoDTO dto) {
-        EstudianteEncargadoDTO nuevo = estudianteEncargadoService.guardar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(true, "Asignación registrada con éxito.", nuevo)
-        );
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<EstudianteEncargadoDTO>> actualizar(
-            @PathVariable Long id,
-            @Valid @RequestBody EstudianteEncargadoDTO dto
-    ) {
-        EstudianteEncargadoDTO actualizado = estudianteEncargadoService.actualizar(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Asignación actualizada completamente con éxito.",
-                actualizado
-        ));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<EstudianteEncargadoDTO>> actualizarParcial(
-            @PathVariable Long id,
-            @RequestBody EstudianteEncargadoDTO dto
-    ) {
-        EstudianteEncargadoDTO actualizado = estudianteEncargadoService.actualizarParcial(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Asignación actualizada parcialmente con éxito.",
-                actualizado
-        ));
+    public ResponseEntity<ApiResponse<EstudianteEncargadoDTO>> crear(@Valid @RequestBody EstudianteEncargadoDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Relación creada", service.crear(dto)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        estudianteEncargadoService.eliminar(id);
-        return ResponseEntity.ok(
-                new ApiResponse<>(true, "Asignación eliminada exitosamente.", null)
-        );
+        service.eliminar(id);
+        return ResponseEntity.ok(new ApiResponse<>(true,"Relacion eliminada correctamente", null));
     }
 }

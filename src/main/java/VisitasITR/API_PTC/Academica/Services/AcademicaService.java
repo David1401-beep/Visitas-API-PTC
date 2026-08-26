@@ -17,97 +17,43 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class AcademicaService {
 
-    private final AcademicaRepository academicaRepository;
+    private final AcademicaRepository repository;
 
-    public List<AcademicaDTO> listarTodos() {
-        return academicaRepository.findAll()
-                .stream()
-                .map(this::convertirEntityADto)
-                .collect(Collectors.toList());
+    public List<AcademicaDTO> obtenerTodos() {
+        return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public AcademicaDTO buscarPorId(Long id) {
-        AcademicaEntity entidad = academicaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Sección académica no encontrada con el ID: " + id));
-
-        return convertirEntityADto(entidad);
+    public AcademicaDTO obtenerPorId(Long id) {
+        return toDTO(repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Académica no encontrada: " + id)));
     }
 
-<<<<<<< HEAD
-    @Transactional // Sobrescribe para operaciones de escritura
-=======
-    // Por defecto, los métodos de esta clase trabajan como operaciones de lectura.
-// Los métodos que modifican datos llevan su propio @Transactional.
     @Transactional
->>>>>>> 105d2b0ff415ec3d09ebf04fcf5026e07b9d64b4
-    public AcademicaDTO guardar(AcademicaDTO dto) {
-        if (academicaRepository.existsBySeccionIgnoreCase(dto.getSeccion())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "La sección académica '" + dto.getSeccion() + "' ya se encuentra registrada.");
+    public AcademicaDTO crear(AcademicaDTO dto) {
+        if (repository.existsByAcademica(dto.getAcademica())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La sección académica ya existe.");
         }
-
-        AcademicaEntity entidad = convertirDtoAEntity(dto);
-        entidad.setIdAcademica(null);
-
-        AcademicaEntity guardado = academicaRepository.save(entidad);
-        return convertirEntityADto(guardado);
+        AcademicaEntity entity = AcademicaEntity.builder().academica(dto.getAcademica()).build();
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public AcademicaDTO actualizar(Long id, AcademicaDTO dto) {
-        AcademicaEntity entidadExistente = academicaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Sección académica no encontrada con el ID: " + id));
-
-        if (academicaRepository.existsBySeccionIgnoreCaseAndIdAcademicaNot(dto.getSeccion(), id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "La sección académica '" + dto.getSeccion() + "' ya existe en otro registro.");
-        }
-
-        entidadExistente.setSeccion(dto.getSeccion());
-        AcademicaEntity actualizado = academicaRepository.save(entidadExistente);
-        return convertirEntityADto(actualizado);
-    }
-
-    @Transactional
-    public AcademicaDTO actualizarAcademica(Long id, AcademicaDTO dto) {
-        AcademicaEntity entidadExistente = academicaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Sección académica no encontrada con el ID: " + id));
-
-        if (dto.getSeccion() != null && !dto.getSeccion().isBlank()) {
-            if (academicaRepository.existsBySeccionIgnoreCaseAndIdAcademicaNot(dto.getSeccion(), id)) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT, "La sección académica '" + dto.getSeccion() + "' ya existe en otro registro.");
-            }
-            entidadExistente.setSeccion(dto.getSeccion());
-        }
-
-        AcademicaEntity actualizado = academicaRepository.save(entidadExistente);
-        return convertirEntityADto(actualizado);
+        AcademicaEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Académica no encontrada: " + id));
+        entity.setAcademica(dto.getAcademica());
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public void eliminar(Long id) {
-        if (!academicaRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "No se encuentra la sección académica con el ID: " + id);
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Académica no encontrada: " + id);
         }
-        academicaRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private AcademicaDTO convertirEntityADto(AcademicaEntity entity) {
-        return AcademicaDTO.builder()
-                .idAcademica(entity.getIdAcademica())
-                .seccion(entity.getSeccion())
-                .build();
-    }
-
-    private AcademicaEntity convertirDtoAEntity(AcademicaDTO dto) {
-        return AcademicaEntity.builder()
-                .idAcademica(dto.getIdAcademica())
-                .seccion(dto.getSeccion())
-                .build();
+    private AcademicaDTO toDTO(AcademicaEntity entity) {
+        return AcademicaDTO.builder().idAcademica(entity.getIdAcademica()).academica(entity.getAcademica()).build();
     }
 }

@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(
-        name = "NIVEL",
-        uniqueConstraints = @UniqueConstraint(name = "NIVEL_NOMBRE_UQ", columnNames = "NIVEL")
-)
+@Table(name = "NIVEL")
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,6 +16,6 @@ public class NivelEntity {
     @Column(name = "ID_NIVEL")
     private Long idNivel;
 
-    @Column(name = "NIVEL", nullable = false, length = 40, unique = true)
+    @Column(name = "NIVEL", nullable = false, unique = true, length = 40)
     private String nivel;
 }

@@ -6,13 +6,12 @@ import lombok.*;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class EspecialidadDTO {
-
     private Long idEspecialidad;
 
-    @NotBlank(message = "El nombre de la especialidad es obligatorio")
-    @Size(max = 60, message = "La especialidad no puede superar los 60 caracteres")
+    @NotBlank(message = "Nombre de especialidad obligatorio")
+    @Size(max = 60, message = "Máximo 60 caracteres")
     private String especialidad;
 }

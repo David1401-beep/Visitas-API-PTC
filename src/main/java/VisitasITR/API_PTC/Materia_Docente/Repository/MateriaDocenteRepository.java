@@ -5,9 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MateriaDocenteRepository extends JpaRepository<MateriaDocenteEntity, Long> {
-
-    boolean existsByDocenteIdDocente(Long idDocente);
-
-    boolean existsByDocenteIdDocenteAndIdMateriaDocenteNot(Long idDocente, Long idMateriaDocente);
-}
+public interface MateriaDocenteRepository extends JpaRepository<MateriaDocenteEntity, Long> {}

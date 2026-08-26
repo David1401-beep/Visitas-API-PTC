@@ -17,87 +17,43 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class EspecialidadService {
 
-    private final EspecialidadRepository especialidadRepository;
+    private final EspecialidadRepository repository;
 
-    public List<EspecialidadDTO> listarTodos() {
-        return especialidadRepository.findAll()
-                .stream()
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+    public List<EspecialidadDTO> obtenerTodos() {
+        return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public EspecialidadDTO buscarPorId(Long id) {
-        EspecialidadEntity especialidad = especialidadRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Especialidad no encontrada con ID: " + id));
-        return convertirADto(especialidad);
+    public EspecialidadDTO obtenerPorId(Long id) {
+        return toDTO(repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Especialidad no encontrada: " + id)));
     }
 
     @Transactional
-    public EspecialidadDTO guardar(EspecialidadDTO dto) {
-        String nombreLimpio = dto.getEspecialidad().trim();
-
-        if (especialidadRepository.existsByEspecialidadIgnoreCase(nombreLimpio)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "La especialidad '" + nombreLimpio + "' ya existe.");
+    public EspecialidadDTO crear(EspecialidadDTO dto) {
+        if (repository.existsByEspecialidad(dto.getEspecialidad())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La especialidad ya existe.");
         }
-
-        EspecialidadEntity especialidad = EspecialidadEntity.builder()
-                .especialidad(nombreLimpio)
-                .build();
-
-        return convertirADto(especialidadRepository.save(especialidad));
+        EspecialidadEntity entity = EspecialidadEntity.builder().especialidad(dto.getEspecialidad()).build();
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public EspecialidadDTO actualizar(Long id, EspecialidadDTO dto) {
-        EspecialidadEntity especialidad = especialidadRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Especialidad no encontrada con ID: " + id));
-
-        String nombreLimpio = dto.getEspecialidad().trim();
-
-        if (especialidadRepository.existsByEspecialidadIgnoreCaseAndIdEspecialidadNot(nombreLimpio, id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "La especialidad '" + nombreLimpio + "' ya pertenece a otro registro.");
-        }
-
-        especialidad.setEspecialidad(nombreLimpio);
-        return convertirADto(especialidadRepository.save(especialidad));
-    }
-
-    @Transactional
-    public EspecialidadDTO actualizarParcial(Long id, EspecialidadDTO dto) {
-        EspecialidadEntity entidadExistente = especialidadRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Especialidad no encontrada con ID: " + id));
-
-        if (dto.getEspecialidad() != null && !dto.getEspecialidad().isBlank()) {
-            String nombreLimpio = dto.getEspecialidad().trim();
-
-            if (especialidadRepository.existsByEspecialidadIgnoreCaseAndIdEspecialidadNot(nombreLimpio, id)) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT, "La especialidad '" + nombreLimpio + "' ya existe.");
-            }
-            entidadExistente.setEspecialidad(nombreLimpio);
-        }
-
-        return convertirADto(especialidadRepository.save(entidadExistente));
+        EspecialidadEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Especialidad no encontrada: " + id));
+        entity.setEspecialidad(dto.getEspecialidad());
+        return toDTO(repository.save(entity));
     }
 
     @Transactional
     public void eliminar(Long id) {
-        if (!especialidadRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "No se encontró la especialidad para eliminar con ID: " + id);
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Especialidad no encontrada: " + id);
         }
-        especialidadRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
-    private EspecialidadDTO convertirADto(EspecialidadEntity entidad) {
-        return EspecialidadDTO.builder()
-                .idEspecialidad(entidad.getIdEspecialidad())
-                .especialidad(entidad.getEspecialidad())
-                .build();
+    private EspecialidadDTO toDTO(EspecialidadEntity entity) {
+        return EspecialidadDTO.builder().idEspecialidad(entity.getIdEspecialidad()).especialidad(entity.getEspecialidad()).build();
     }
 }

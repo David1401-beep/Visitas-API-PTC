@@ -16,48 +16,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EspecialidadController {
 
-    private final EspecialidadService especialidadService;
+    private final EspecialidadService service;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<EspecialidadDTO>>> listar() {
-        List<EspecialidadDTO> lista = especialidadService.listarTodos();
-        return ResponseEntity.ok(new ApiResponse<>(true, "Lista de especialidades obtenida exitosamente.", lista));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Especialidades obtenidas", service.obtenerTodos()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<EspecialidadDTO>> obtenerPorId(@PathVariable Long id) {
-        EspecialidadDTO dto = especialidadService.buscarPorId(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad encontrada con éxito.", dto));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad obtenida", service.obtenerPorId(id)));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<EspecialidadDTO>> crear(@Valid @RequestBody EspecialidadDTO dto) {
-        EspecialidadDTO nuevo = especialidadService.guardar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "Especialidad registrada con éxito.", nuevo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Especialidad creada", service.crear(dto)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<EspecialidadDTO>> actualizar(
-            @PathVariable Long id,
-            @Valid @RequestBody EspecialidadDTO dto
-    ) {
-        EspecialidadDTO actualizado = especialidadService.actualizar(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad actualizada completamente.", actualizado));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<EspecialidadDTO>> actualizarEspecialidad(
-            @PathVariable Long id,
-            @RequestBody EspecialidadDTO dto
-    ) {
-        EspecialidadDTO actualizado = especialidadService.actualizar(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad actualizada parcialmente con éxito.", actualizado));
+    public ResponseEntity<ApiResponse<EspecialidadDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody EspecialidadDTO dto) {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad actualizada", service.actualizar(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        especialidadService.eliminar(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad eliminada exitosamente.", null));
+        service.eliminar(id);
+        return ResponseEntity.ok(new ApiResponse<>(true,"Especialidad eliminada", null));
     }
 }

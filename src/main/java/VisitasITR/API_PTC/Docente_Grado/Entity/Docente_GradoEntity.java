@@ -6,13 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(
-        name = "DOCENTE_GRADO",
-        uniqueConstraints = @UniqueConstraint(
-                name = "DOCENTE_GRADO_UQ",
-                columnNames = {"ID_DOCENTE", "ID_GRADO", "ANIO_ESCOLAR"}
-        )
-)
+@Table(name = "DOCENTE_GRADO")
 @Data
 @Builder
 @NoArgsConstructor
@@ -32,6 +26,6 @@ public class Docente_GradoEntity {
     @JoinColumn(name = "ID_GRADO", nullable = false)
     private GradoEntity grado;
 
-    @Column(name = "ANIO_ESCOLAR", nullable = false, length = 4)
+    @Column(name = "ANIO_ESCOLAR", nullable = false)
     private Integer anioEscolar;
 }

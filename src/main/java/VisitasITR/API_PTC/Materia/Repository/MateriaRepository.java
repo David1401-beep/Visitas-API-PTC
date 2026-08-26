@@ -6,8 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MateriaRepository extends JpaRepository<MateriaEntity, Long> {
-
-    boolean existsByNombreIgnoreCase(String nombre);
-
-    boolean existsByNombreIgnoreCaseAndIdMateriaNot(String nombre, Long idMateria);
+    boolean existsByMatNombre(String matNombre);
 }

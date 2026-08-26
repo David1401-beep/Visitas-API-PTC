@@ -2,6 +2,7 @@ package VisitasITR.API_PTC.Nivel.Controller;
 
 import VisitasITR.API_PTC.Nivel.DTO.NivelDTO;
 import VisitasITR.API_PTC.Nivel.Services.NivelService;
+import VisitasITR.API_PTC.Nivel.Services.NivelService;
 import VisitasITR.API_PTC.Response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,67 +17,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NivelController {
 
-    private final NivelService nivelService;
+    private final NivelService service;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<NivelDTO>>> listar() {
-        List<NivelDTO> lista = nivelService.listarTodos();
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Lista de niveles obtenida exitosamente.",
-                lista
-        ));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Niveles obtenidos", service.obtenerTodos()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<NivelDTO>> obtenerPorId(@PathVariable Long id) {
-        NivelDTO dto = nivelService.buscarPorId(id);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Nivel encontrado con éxito.",
-                dto
-        ));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Nivel obtenido", service.obtenerPorId(id)));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<NivelDTO>> crear(@Valid @RequestBody NivelDTO dto) {
-        NivelDTO nuevo = nivelService.guardar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(true, "Nivel registrado con éxito.", nuevo)
-        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Nivel creado", service.crear(dto)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<NivelDTO>> actualizar(
-            @PathVariable Long id,
-            @Valid @RequestBody NivelDTO dto
-    ) {
-        NivelDTO actualizado = nivelService.actualizar(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Nivel actualizado completamente con éxito.",
-                actualizado
-        ));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<NivelDTO>> actualizarParcial(
-            @PathVariable Long id,
-            @RequestBody NivelDTO dto
-    ) {
-        NivelDTO actualizado = nivelService.actualizarParcial(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(
-                true,
-                "Nivel actualizado parcialmente con éxito.",
-                actualizado
-        ));
+    public ResponseEntity<ApiResponse<NivelDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody NivelDTO dto) {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Nivel actualizado", service.actualizar(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
-        nivelService.eliminar(id);
-        return ResponseEntity.ok(
-                new ApiResponse<>(true, "Nivel eliminado exitosamente.", null)
-        );
+        service.eliminar(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Nivel eliminado", null));
     }
 }
