@@ -1,4 +1,4 @@
-package VisitasITR.API_PTC.Adminitrador.Repository;
+package VisitasITR.API_PTC.Administrador.Repository;
 
 import VisitasITR.API_PTC.Administrador.Entity.AdministradorEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

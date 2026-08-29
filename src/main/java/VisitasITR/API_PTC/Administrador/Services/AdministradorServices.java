@@ -1,10 +1,11 @@
-package VisitasITR.API_PTC.Adminitrador.Services;
+package VisitasITR.API_PTC.Administrador.Services;
 
 import VisitasITR.API_PTC.Administrador.DTO.AdministradorDTO;
 import VisitasITR.API_PTC.Administrador.Entity.AdministradorEntity;
-import VisitasITR.API_PTC.Adminitrador.Repository.AdministradorRepository;
+import VisitasITR.API_PTC.Administrador.Repository.AdministradorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class AdministradorServices {
 
     private final AdministradorRepository administradorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<AdministradorDTO> obtenerTodos() {
         return administradorRepository.findAll().stream()
@@ -28,7 +30,9 @@ public class AdministradorServices {
     public AdministradorDTO obtenerPorId(Long id) {
         AdministradorEntity entity = administradorRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Administrador no encontrado con ID: " + id));
+                        HttpStatus.NOT_FOUND,
+                        "Administrador no encontrado con ID: " + id
+                ));
         return convertirADTO(entity);
     }
 
@@ -36,15 +40,28 @@ public class AdministradorServices {
     public AdministradorDTO crear(AdministradorDTO dto) {
         if (administradorRepository.existsByAdmCorreo(dto.getAdmCorreo())) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El correo " + dto.getAdmCorreo() + " ya está registrado.");
+                    HttpStatus.CONFLICT,
+                    "El correo " + dto.getAdmCorreo() + " ya está registrado."
+            );
+        }
+
+        if (dto.getAdmPassword() == null || dto.getAdmPassword().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La contraseña del administrador es obligatoria."
+            );
         }
 
         AdministradorEntity entity = AdministradorEntity.builder()
                 .admNombre(dto.getAdmNombre())
                 .admApellido(dto.getAdmApellido())
                 .admCorreo(dto.getAdmCorreo())
-                .admPassword(dto.getAdmPassword() != null ? dto.getAdmPassword() : "123456")
-                .admRol(dto.getAdmRol() != null ? dto.getAdmRol() : "ADMINISTRADOR")
+                .admPassword(passwordEncoder.encode(dto.getAdmPassword()))
+                .admRol(
+                        dto.getAdmRol() != null && !dto.getAdmRol().isBlank()
+                                ? dto.getAdmRol()
+                                : "ADMINISTRADOR"
+                )
                 .build();
 
         return convertirADTO(administradorRepository.save(entity));
@@ -54,11 +71,19 @@ public class AdministradorServices {
     public AdministradorDTO actualizar(Long id, AdministradorDTO dto) {
         AdministradorEntity entity = administradorRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Administrador no encontrado con ID: " + id));
+                        HttpStatus.NOT_FOUND,
+                        "Administrador no encontrado con ID: " + id
+                ));
 
-        if (administradorRepository.existsByAdmCorreoAndIdAdministradorNot(dto.getAdmCorreo(), id)) {
+        if (administradorRepository.existsByAdmCorreoAndIdAdministradorNot(
+                dto.getAdmCorreo(),
+                id
+        )) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "El correo " + dto.getAdmCorreo() + " ya está registrado por otro usuario.");
+                    HttpStatus.CONFLICT,
+                    "El correo " + dto.getAdmCorreo()
+                            + " ya está registrado por otro usuario."
+            );
         }
 
         entity.setAdmNombre(dto.getAdmNombre());
@@ -66,10 +91,12 @@ public class AdministradorServices {
         entity.setAdmCorreo(dto.getAdmCorreo());
 
         if (dto.getAdmPassword() != null && !dto.getAdmPassword().isBlank()) {
-            entity.setAdmPassword(dto.getAdmPassword());
+            entity.setAdmPassword(
+                    passwordEncoder.encode(dto.getAdmPassword())
+            );
         }
 
-        if (dto.getAdmRol() != null) {
+        if (dto.getAdmRol() != null && !dto.getAdmRol().isBlank()) {
             entity.setAdmRol(dto.getAdmRol());
         }
 
@@ -80,8 +107,11 @@ public class AdministradorServices {
     public void eliminar(Long id) {
         if (!administradorRepository.existsById(id)) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Administrador no encontrado para eliminar con ID: " + id);
+                    HttpStatus.NOT_FOUND,
+                    "Administrador no encontrado para eliminar con ID: " + id
+            );
         }
+
         administradorRepository.deleteById(id);
     }
 

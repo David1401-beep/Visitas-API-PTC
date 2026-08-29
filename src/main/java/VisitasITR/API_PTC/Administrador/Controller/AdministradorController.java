@@ -1,7 +1,7 @@
-package VisitasITR.API_PTC.Adminitrador.Controller;
+package VisitasITR.API_PTC.Administrador.Controller;
 
 import VisitasITR.API_PTC.Administrador.DTO.AdministradorDTO;
-import VisitasITR.API_PTC.Adminitrador.Services.AdministradorServices;
+import VisitasITR.API_PTC.Administrador.Services.AdministradorServices;
 import VisitasITR.API_PTC.Response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
