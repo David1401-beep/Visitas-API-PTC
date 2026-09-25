@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashMap;
@@ -25,6 +26,14 @@ public class ManejadorExcepciones {
 
         return ResponseEntity.badRequest().body(
                 new ApiResponse<>(false, "Hay campos con datos invalidos.", errores)
+        );
+    }
+
+    //Cuando piden subir un archivo pero no lo adjuntan.
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ApiResponse<Void>> archivoFaltante(MultipartException ex) {
+        return ResponseEntity.badRequest().body(
+                new ApiResponse<>(false, "Debe adjuntar un archivo en el campo 'file'.", null)
         );
     }
 

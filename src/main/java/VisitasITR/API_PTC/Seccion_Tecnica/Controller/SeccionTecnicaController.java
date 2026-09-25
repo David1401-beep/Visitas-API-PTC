@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,26 +19,31 @@ public class SeccionTecnicaController {
 
     private final SeccionTecnicaService service;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<ApiResponse<List<SeccionTecnicaDTO>>> listar() {
         return ResponseEntity.ok(new ApiResponse<>(true, "Secciones Técnicas obtenidas", service.obtenerTodos()));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<SeccionTecnicaDTO>> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Sección Técnica obtenida", service.obtenerPorId(id)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<ApiResponse<SeccionTecnicaDTO>> crear(@Valid @RequestBody SeccionTecnicaDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Sección Técnica creada", service.crear(dto)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<SeccionTecnicaDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody SeccionTecnicaDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Sección Técnica actualizada", service.actualizar(id, dto)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         service.eliminar(id);

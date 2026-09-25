@@ -6,6 +6,8 @@ import VisitasITR.API_PTC.Comunicado.Repository.ComunicadoRepository;
 import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
 import VisitasITR.API_PTC.Docente.Repository.DocenteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -153,5 +155,10 @@ public class ComunicadoService {
                 .comFecha(entity.getComFecha())
                 .comActivo(entity.getComActivo())
                 .build();
+    }
+
+    //Listar paginado
+    public Page<ComunicadoDTO> obtenerPaginado(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toDTO);
     }
 }

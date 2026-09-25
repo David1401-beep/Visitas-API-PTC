@@ -32,3 +32,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Variables privadas ###
+# Nunca se versionan: contienen la clave de la BD, el JWT_SECRET y las
+# credenciales de Cloudinary. La plantilla sin valores es .env.example.
+.env
+*.env
+!.env.example

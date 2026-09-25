@@ -4,6 +4,8 @@ import VisitasITR.API_PTC.Docente.DTO.DocenteDTO;
 import VisitasITR.API_PTC.Docente.Entity.DocenteEntity;
 import VisitasITR.API_PTC.Docente.Repository.DocenteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -76,6 +78,7 @@ public class DocenteServices {
                                 ? dto.getDocRol()
                                 : "DOCENTE"
                 )
+                .docFotoUrl(dto.getDocFotoUrl())
                 .build();
 
         return convertirADTO(docenteRepository.save(entity));
@@ -124,6 +127,11 @@ public class DocenteServices {
             entity.setDocRol(dto.getDocRol());
         }
 
+        // Si manda una foto nueva, se cambia
+        if (dto.getDocFotoUrl() != null && !dto.getDocFotoUrl().isBlank()) {
+            entity.setDocFotoUrl(dto.getDocFotoUrl());
+        }
+
         return convertirADTO(docenteRepository.save(entity));
     }
 
@@ -152,6 +160,12 @@ public class DocenteServices {
                 .docCorreo(entity.getDocCorreo())
                 .docTipo(entity.getDocTipo())
                 .docRol(entity.getDocRol())
+                .docFotoUrl(entity.getDocFotoUrl())
                 .build();
+    }
+
+    //Listar paginado
+    public Page<DocenteDTO> obtenerPaginado(Pageable pageable) {
+        return docenteRepository.findAll(pageable).map(this::convertirADTO);
     }
 }

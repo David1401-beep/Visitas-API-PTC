@@ -39,4 +39,8 @@ public class DocenteEntity {
 
     @Column(name = "DOC_ROL", nullable = false, length = 25)
     private String docRol;
+
+    //Aqui guardo solo la direccion de la foto, no la imagen.
+    @Column(name = "DOC_FOTO_URL", length = 300)
+    private String docFotoUrl;
 }

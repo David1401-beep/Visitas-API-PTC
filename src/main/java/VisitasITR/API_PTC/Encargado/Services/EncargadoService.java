@@ -4,6 +4,8 @@ import VisitasITR.API_PTC.Encargado.DTO.EncargadoDTO;
 import VisitasITR.API_PTC.Encargado.Entity.EncargadoEntity;
 import VisitasITR.API_PTC.Encargado.Reposity.EncargadoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,5 +71,10 @@ public class EncargadoService {
                 .encTelefono(entity.getEncTelefono())
                 .encTipo(entity.getEncTipo())
                 .build();
+    }
+
+    //Listar paginado
+    public Page<EncargadoDTO> obtenerPaginado(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toDTO);
     }
 }

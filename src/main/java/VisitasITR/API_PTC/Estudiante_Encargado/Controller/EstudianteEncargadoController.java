@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,21 +19,25 @@ public class EstudianteEncargadoController {
 
     private final EstudianteEncargadoService service;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<ApiResponse<List<EstudianteEncargadoDTO>>> listar() {
         return ResponseEntity.ok(new ApiResponse<>(true, "Relaciones obtenidas", service.obtenerTodos()));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<EstudianteEncargadoDTO>> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Relación obtenida", service.obtenerPorId(id)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<ApiResponse<EstudianteEncargadoDTO>> crear(@Valid @RequestBody EstudianteEncargadoDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Relación creada", service.crear(dto)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         service.eliminar(id);

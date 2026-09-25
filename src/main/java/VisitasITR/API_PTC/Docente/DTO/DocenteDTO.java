@@ -41,4 +41,7 @@ public class DocenteDTO {
     private String docTipo;
 
     private String docRol;
+
+    @Size(max = 300, message = "La URL de la foto no debe exceder los 300 caracteres")
+    private String docFotoUrl;
 }

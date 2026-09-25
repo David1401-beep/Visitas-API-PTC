@@ -10,6 +10,8 @@ import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import VisitasITR.API_PTC.Estudiante_Encargado.Entity.EstudianteEncargadoEntity;
 import VisitasITR.API_PTC.Estudiante_Encargado.Reposity.EstudianteEncargadoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -192,5 +194,10 @@ public class CitaReunionService {
                 .citObservaciones(entity.getCitObservaciones())
                 .citFechaReunion(entity.getCitFechaReunion())
                 .build();
+    }
+
+    //Listar paginado
+    public Page<CitaReunionDTO> obtenerPaginado(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toDTO);
     }
 }

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,26 +19,31 @@ public class EspecialidadController {
 
     private final EspecialidadService service;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<ApiResponse<List<EspecialidadDTO>>> listar() {
         return ResponseEntity.ok(new ApiResponse<>(true, "Especialidades obtenidas", service.obtenerTodos()));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<EspecialidadDTO>> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad obtenida", service.obtenerPorId(id)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<ApiResponse<EspecialidadDTO>> crear(@Valid @RequestBody EspecialidadDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Especialidad creada", service.crear(dto)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<EspecialidadDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody EspecialidadDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Especialidad actualizada", service.actualizar(id, dto)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         service.eliminar(id);

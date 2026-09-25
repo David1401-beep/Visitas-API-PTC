@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,32 +20,38 @@ public class RecepcionistaController {
 
     private final RecepcionistaServices service;
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<RecepcionistaDTO>>> listar() {
         return ResponseEntity.ok(new ApiResponse<>(true, "Recepcionistas obtenidos", service.obtenerTodos()));
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<RecepcionistaDTO>> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Recepcionista obtenido", service.obtenerPorId(id)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<ApiResponse<RecepcionistaDTO>> crear(@Valid @RequestBody RecepcionistaDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(true, "Recepcionista creado", service.crear(dto)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<RecepcionistaDTO>> actualizar(@PathVariable Long id, @Valid @RequestBody RecepcionistaDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Recepcionista actualizado", service.actualizar(id, dto)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<RecepcionistaDTO>> patch(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Recepcionista actualizado parcialmente", service.patch(id, updates)));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         service.eliminar(id);

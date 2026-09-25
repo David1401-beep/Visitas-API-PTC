@@ -6,6 +6,8 @@ import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import VisitasITR.API_PTC.Estudiante.Repository.EstudianteRepository;
 import VisitasITR.API_PTC.Grado.Repository.GradoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -209,5 +211,10 @@ public class EstudianteServices {
                 .idGrado(entity.getGrado().getIdGrado())
                 .nombreGrado(entity.getGrado().getGrado())
                 .build();
+    }
+
+    //Listar paginado
+    public Page<EstudianteDTO> obtenerPaginado(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toDTO);
     }
 }

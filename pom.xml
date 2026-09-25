@@ -20,6 +20,8 @@
 
 	<properties>
 		<java.version>17</java.version>
+		<jjwt.version>0.11.5</jjwt.version>
+		<cloudinary.version>1.39.0</cloudinary.version>
 	</properties>
 
 	<dependencies>
@@ -42,6 +44,38 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
+		</dependency>
+
+		<!-- Seguridad stateless: filtra cada peticion y aplica @PreAuthorize. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- Valida los JWT que emite la API-AUTH (misma firma HMAC). -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Almacenamiento de imagenes en CDN; la BD solo guarda la URL. -->
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http44</artifactId>
+			<version>${cloudinary.version}</version>
 		</dependency>
 
 		<!-- Upgraded to ojdbc17 to match Java 17 -->
