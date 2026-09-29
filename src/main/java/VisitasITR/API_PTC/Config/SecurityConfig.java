@@ -49,6 +49,18 @@ public class SecurityConfig {
             "/api/v1/estudiante-encargados/**"
     };
 
+    // Rutas del inicio de sesion. Entran sin token, porque es justo ahi
+    // donde se pide.
+    private static final String[] RUTAS_PUBLICAS = {
+            "/api/v1/auth/login",
+            "/api/v1/auth/logout",
+            "/api/v1/auth/health",
+            "/api/v1/usuarios/inicio-sesion-encargado",
+
+            // Recuperar la contrasena: quien llega aqui todavia no puede entrar.
+            "/api/v1/auth/recuperacion/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -63,6 +75,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(RespuestasSeguridad.accesoDenegado()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(RUTAS_PUBLICAS).permitAll()
 
                         // Los administradores solo los maneja un administrador.
                         .requestMatchers("/api/v1/administradores/**")

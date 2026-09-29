@@ -39,11 +39,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtService.obtenerClaims(token);
 
+                String rol = claims.get("rol", String.class);
+                Number id = claims.get("idUsuario", Number.class);
+
+                // Dejo aqui los datos del token para que /auth/me los devuelva
+                // sin volver a consultar la base.
+                UsuarioAutenticado usuario = new UsuarioAutenticado(
+                        id == null ? null : id.longValue(),
+                        claims.getSubject(),
+                        rol
+                );
+
                 UsernamePasswordAuthenticationToken autenticacion =
                         new UsernamePasswordAuthenticationToken(
-                                claims.getSubject(),
+                                usuario,
                                 null,
-                                RolesAuth.autoridades(claims.get("rol", String.class))
+                                RolesAuth.autoridades(rol)
                         );
 
                 autenticacion.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
