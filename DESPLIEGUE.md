@@ -44,22 +44,19 @@ En orden, sobre el esquema ya migrado a Oracle Cloud:
 
 Sin la vista, cualquier intento de login responde error 500.
 
-## Despues de desplegar
+## Direcciones ya desplegadas
 
-La URL de la API hay que ponerla en los dos frontends, en la constante
-`API_EN_LA_NUBE`:
+| Que | Donde |
+| --- | --- |
+| API (Heroku) | `https://gestor-de-visitas-itr-53fe7294e1e4.herokuapp.com` |
+| Sitio web (Vercel) | `https://visitas-itr-web.vercel.app` |
 
-- Sitio web: `js/config.js`
-- App movil: `js/config.js`
+Ya quedaron puestas en los dos `js/config.js`, en la constante
+`API_EN_LA_NUBE`. Los archivos detectan solos donde corren: en `localhost`
+usan la API local del puerto 8080, y publicados usan la de Heroku.
 
-Queda asi, con `/api/v1` al final y sin barra despues:
-
-```js
-const API_EN_LA_NUBE = "https://el-nombre-de-la-app.herokuapp.com/api/v1";
-```
-
-Y esa misma URL del **frontend** (no la de la API) es la que va en
-`CORS_ORIGINS`. Si no coincide exactamente, el navegador bloquea las llamadas.
+Y la del sitio web ya esta en `CORS_ORIGINS` del `.env`. Falta cargarla
+igual en las Config Vars de Heroku, porque ese archivo no se lee alla.
 
 ## Pendiente de decidir
 

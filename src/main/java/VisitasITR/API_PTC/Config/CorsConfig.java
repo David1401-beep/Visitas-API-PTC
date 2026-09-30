@@ -19,9 +19,15 @@ public class CorsConfig {
 
     private final List<String> origenesPermitidos;
 
-    public CorsConfig(@Value("${app.cors.origenes}") String origenes) {
+    public CorsConfig(@Value("${app.cors.origenes:}") String origenes) {
         this.origenesPermitidos = Arrays.stream(origenes.split(","))
                 .map(String::trim)
+                // Le quito la barra del final. El navegador manda el origen
+                // sin ella ("https://sitio.com"), asi que si en la variable
+                // viene con barra no coincide con nada y bloquea todo.
+                .map(origen -> origen.endsWith("/")
+                        ? origen.substring(0, origen.length() - 1)
+                        : origen)
                 .filter(origen -> !origen.isEmpty())
                 .toList();
     }
