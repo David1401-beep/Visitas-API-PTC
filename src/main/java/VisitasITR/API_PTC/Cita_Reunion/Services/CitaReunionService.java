@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,14 @@ public class CitaReunionService {
     private final CitaReunionRepository repository;
     private final DocenteRepository docenteRepository;
     private final EstudianteEncargadoRepository estudianteEncargadoRepository;
+
+    // Horario de atencion del colegio:
+    //   lunes a viernes  8:00 a 16:00
+    //   sabado           8:00 a 11:00
+    //   domingo          cerrado
+    private static final LocalTime HORA_APERTURA = LocalTime.of(8, 0);
+    private static final LocalTime CIERRE_ENTRE_SEMANA = LocalTime.of(16, 0);
+    private static final LocalTime CIERRE_SABADO = LocalTime.of(11, 0);
 
     public List<CitaReunionDTO> obtenerTodos() {
         return repository.findAllByOrderByCitFechaReunionDesc().stream()
@@ -90,6 +100,8 @@ public class CitaReunionService {
 
     @Transactional
     public CitaReunionDTO crear(CitaReunionDTO dto) {
+        validarHorario(dto.getCitFechaReunion());
+
         CitaReunionEntity entity = CitaReunionEntity.builder()
                 .docente(buscarDocente(dto.getIdDocente()))
                 .estudianteEncargado(buscarRelacion(dto.getIdEstudianteEncargado()))
@@ -106,6 +118,8 @@ public class CitaReunionService {
     public CitaReunionDTO actualizar(Long id, CitaReunionDTO dto) {
         CitaReunionEntity entity = repository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita de reunion no encontrada: " + id));
+
+        validarHorario(dto.getCitFechaReunion());
 
         entity.setDocente(buscarDocente(dto.getIdDocente()));
         entity.setEstudianteEncargado(buscarRelacion(dto.getIdEstudianteEncargado()));
@@ -136,7 +150,9 @@ public class CitaReunionService {
             Object fecha = updates.get("citFechaReunion");
 
             if (fecha != null) {
-                entity.setCitFechaReunion(LocalDateTime.parse(fecha.toString()));
+                LocalDateTime nueva = LocalDateTime.parse(fecha.toString());
+                validarHorario(nueva);
+                entity.setCitFechaReunion(nueva);
             }
         }
 
@@ -172,6 +188,31 @@ public class CitaReunionService {
         if (estado == null || !validos.contains(estado)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Estado no valido: " + estado + ". Use " + String.join(", ", validos));
+        }
+    }
+
+    // Las citas solo se pueden agendar cuando el colegio esta abierto.
+    private void validarHorario(LocalDateTime fechaReunion) {
+        if (fechaReunion == null) {
+            return;
+        }
+
+        DayOfWeek dia = fechaReunion.getDayOfWeek();
+
+        if (dia == DayOfWeek.SUNDAY) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Los domingos la institucion esta cerrada.");
+        }
+
+        LocalTime apertura = HORA_APERTURA;
+        LocalTime cierre = dia == DayOfWeek.SATURDAY ? CIERRE_SABADO : CIERRE_ENTRE_SEMANA;
+        LocalTime hora = fechaReunion.toLocalTime();
+
+        if (hora.isBefore(apertura) || hora.isAfter(cierre)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    dia == DayOfWeek.SATURDAY
+                            ? "Los sabados se atiende de " + apertura + " a " + cierre + "."
+                            : "La hora debe estar entre las " + apertura + " y las " + cierre + ".");
         }
     }
 
