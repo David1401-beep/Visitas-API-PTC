@@ -8,11 +8,15 @@ import VisitasITR.API_PTC.Docente.Repository.DocenteRepository;
 import VisitasITR.API_PTC.Encargado.Entity.EncargadoEntity;
 import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import VisitasITR.API_PTC.Estudiante_Encargado.Entity.EstudianteEncargadoEntity;
-import VisitasITR.API_PTC.Estudiante_Encargado.Reposity.EstudianteEncargadoRepository;
+import VisitasITR.API_PTC.Estudiante_Encargado.Repository.EstudianteEncargadoRepository;
+import VisitasITR.API_PTC.Security.RolesAuth;
+import VisitasITR.API_PTC.Security.UsuarioAutenticado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -101,6 +105,7 @@ public class CitaReunionService {
     @Transactional
     public CitaReunionDTO crear(CitaReunionDTO dto) {
         validarHorario(dto.getCitFechaReunion());
+        validarFechaFutura(dto.getCitFechaReunion());
 
         CitaReunionEntity entity = CitaReunionEntity.builder()
                 .docente(buscarDocente(dto.getIdDocente()))
@@ -119,7 +124,9 @@ public class CitaReunionService {
         CitaReunionEntity entity = repository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita de reunion no encontrada: " + id));
 
+        validarAcceso(entity);
         validarHorario(dto.getCitFechaReunion());
+        validarCambioDeFecha(entity.getCitFechaReunion(), dto.getCitFechaReunion());
 
         entity.setDocente(buscarDocente(dto.getIdDocente()));
         entity.setEstudianteEncargado(buscarRelacion(dto.getIdEstudianteEncargado()));
@@ -135,6 +142,8 @@ public class CitaReunionService {
     public CitaReunionDTO patchEstado(Long id, Map<String, Object> updates) {
         CitaReunionEntity entity = repository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita de reunion no encontrada: " + id));
+
+        validarAcceso(entity);
 
         if (updates.containsKey("citEstado")) {
             String estado = (String) updates.get("citEstado");
@@ -152,6 +161,7 @@ public class CitaReunionService {
             if (fecha != null) {
                 LocalDateTime nueva = LocalDateTime.parse(fecha.toString());
                 validarHorario(nueva);
+                validarCambioDeFecha(entity.getCitFechaReunion(), nueva);
                 entity.setCitFechaReunion(nueva);
             }
         }
@@ -161,11 +171,12 @@ public class CitaReunionService {
 
     @Transactional
     public void eliminar(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita de reunion no encontrada: " + id);
-        }
+        CitaReunionEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita de reunion no encontrada: " + id));
 
-        repository.deleteById(id);
+        validarAcceso(entity);
+
+        repository.delete(entity);
     }
 
     // Apoyo
@@ -188,6 +199,76 @@ public class CitaReunionService {
         if (estado == null || !validos.contains(estado)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Estado no valido: " + estado + ". Use " + String.join(", ", validos));
+        }
+    }
+
+    // Una cita solo la puede tocar quien participa en ella: el docente al que
+    // le toca, o el encargado del estudiante. El administrador y la
+    // recepcionista entran a todas porque ese es su trabajo.
+    //
+    // Sin esto bastaba con tener la sesion abierta para cambiar la cita de
+    // cualquier otra persona, porque el id del docente lo pone el navegador.
+    private void validarAcceso(CitaReunionEntity cita) {
+        UsuarioAutenticado usuario = usuarioActual();
+
+        if (usuario == null || usuario.id() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "No fue posible identificar al usuario de la sesion.");
+        }
+
+        String rol = RolesAuth.normalizar(usuario.rol());
+
+        if (rol.equals("ADMINISTRADOR") || rol.equals("RECEPCIONISTA")) {
+            return;
+        }
+
+        // El id del token es el de la tabla de origen: para un docente es su
+        // ID_DOCENTE y para un encargado el ID_ESTUDIANTE con el que entro.
+        if (rol.startsWith("DOCENTE")
+                && usuario.id().equals(cita.getDocente().getIdDocente())) {
+            return;
+        }
+
+        if (rol.equals("ENCARGADO")
+                && usuario.id().equals(
+                        cita.getEstudianteEncargado().getEstudiante().getIdEstudiante())) {
+            return;
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "Esta cita no le pertenece.");
+    }
+
+    private UsuarioAutenticado usuarioActual() {
+        Authentication autenticacion = SecurityContextHolder.getContext().getAuthentication();
+
+        if (autenticacion == null
+                || !(autenticacion.getPrincipal() instanceof UsuarioAutenticado usuario)) {
+            return null;
+        }
+
+        return usuario;
+    }
+
+    // Solo reviso que sea futura cuando la fecha de verdad cambia. Si la
+    // dejan igual es porque estan editando otra cosa (el motivo, el estado)
+    // y una cita vieja se tiene que poder seguir cerrando.
+    private void validarCambioDeFecha(LocalDateTime actual, LocalDateTime nueva) {
+        if (nueva == null || nueva.equals(actual)) {
+            return;
+        }
+
+        validarFechaFutura(nueva);
+    }
+
+    private void validarFechaFutura(LocalDateTime fechaReunion) {
+        if (fechaReunion == null) {
+            return;
+        }
+
+        if (fechaReunion.isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La fecha de la reunion ya paso. Elija una fecha futura.");
         }
     }
 

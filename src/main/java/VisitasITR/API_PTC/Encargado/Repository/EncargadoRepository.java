@@ -1,4 +1,4 @@
-package VisitasITR.API_PTC.Encargado.Reposity;
+package VisitasITR.API_PTC.Encargado.Repository;
 
 import VisitasITR.API_PTC.Encargado.Entity.EncargadoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -5,7 +5,7 @@ import VisitasITR.API_PTC.Grado.DTO.GradoDTO;
 import VisitasITR.API_PTC.Grado.Entity.GradoEntity;
 import VisitasITR.API_PTC.Grado.Repository.GradoRepository;
 import VisitasITR.API_PTC.Nivel.Repository.NivelRepository;
-import VisitasITR.API_PTC.Seccion_Tecnica.Reposity.SeccionTecnicaRepository;
+import VisitasITR.API_PTC.Seccion_Tecnica.Repository.SeccionTecnicaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

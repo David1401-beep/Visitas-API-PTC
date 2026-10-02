@@ -2,7 +2,7 @@ package VisitasITR.API_PTC.Seccion_Tecnica.Services;
 
 import VisitasITR.API_PTC.Seccion_Tecnica.DTO.SeccionTecnicaDTO;
 import VisitasITR.API_PTC.Seccion_Tecnica.Entity.SeccionTecnicaEntity;
-import VisitasITR.API_PTC.Seccion_Tecnica.Reposity.SeccionTecnicaRepository;
+import VisitasITR.API_PTC.Seccion_Tecnica.Repository.SeccionTecnicaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

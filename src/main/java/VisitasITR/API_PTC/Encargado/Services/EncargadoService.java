@@ -2,7 +2,7 @@ package VisitasITR.API_PTC.Encargado.Services;
 
 import VisitasITR.API_PTC.Encargado.DTO.EncargadoDTO;
 import VisitasITR.API_PTC.Encargado.Entity.EncargadoEntity;
-import VisitasITR.API_PTC.Encargado.Reposity.EncargadoRepository;
+import VisitasITR.API_PTC.Encargado.Repository.EncargadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

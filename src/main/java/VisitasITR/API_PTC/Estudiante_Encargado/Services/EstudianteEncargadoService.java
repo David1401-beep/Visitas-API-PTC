@@ -1,10 +1,10 @@
 package VisitasITR.API_PTC.Estudiante_Encargado.Services;
 
-import VisitasITR.API_PTC.Encargado.Reposity.EncargadoRepository;
+import VisitasITR.API_PTC.Encargado.Repository.EncargadoRepository;
 import VisitasITR.API_PTC.Estudiante.Repository.EstudianteRepository;
 import VisitasITR.API_PTC.Estudiante_Encargado.DTO.EstudianteEncargadoDTO;
 import VisitasITR.API_PTC.Estudiante_Encargado.Entity.EstudianteEncargadoEntity;
-import VisitasITR.API_PTC.Estudiante_Encargado.Reposity.EstudianteEncargadoRepository;
+import VisitasITR.API_PTC.Estudiante_Encargado.Repository.EstudianteEncargadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

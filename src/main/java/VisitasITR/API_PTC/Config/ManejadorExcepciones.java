@@ -75,14 +75,13 @@ public class ManejadorExcepciones {
     
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> general(Exception ex) {
+        // El detalle queda en el log del servidor. Al navegador le mando un
+        // mensaje fijo, porque el de la excepcion suele traer nombres de
+        // clases y pedazos de SQL que no le sirven a quien usa el sistema.
         ex.printStackTrace();
 
-        String mensaje = ex.getMessage() != null
-                ? ex.getMessage()
-                : "Ocurrio un error inesperado en el servidor.";
-
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiResponse<>(false, mensaje, null)
+                new ApiResponse<>(false, "Ocurrio un error inesperado en el servidor.", null)
         );
     }
 }
