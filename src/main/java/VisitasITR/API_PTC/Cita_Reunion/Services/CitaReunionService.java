@@ -40,11 +40,10 @@ public class CitaReunionService {
 
     // Horario de atencion del colegio:
     //   lunes a viernes  8:00 a 16:00
-    //   sabado           8:00 a 11:00
+    //   sabado           cerrado
     //   domingo          cerrado
     private static final LocalTime HORA_APERTURA = LocalTime.of(8, 0);
-    private static final LocalTime CIERRE_ENTRE_SEMANA = LocalTime.of(16, 0);
-    private static final LocalTime CIERRE_SABADO = LocalTime.of(11, 0);
+    private static final LocalTime HORA_CIERRE = LocalTime.of(16, 0);
 
     public List<CitaReunionDTO> obtenerTodos() {
         return repository.findAllByOrderByCitFechaReunionDesc().stream()
@@ -280,20 +279,16 @@ public class CitaReunionService {
 
         DayOfWeek dia = fechaReunion.getDayOfWeek();
 
-        if (dia == DayOfWeek.SUNDAY) {
+        if (dia == DayOfWeek.SATURDAY || dia == DayOfWeek.SUNDAY) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Los domingos la institucion esta cerrada.");
+                    "Los fines de semana no se atienden reuniones.");
         }
 
-        LocalTime apertura = HORA_APERTURA;
-        LocalTime cierre = dia == DayOfWeek.SATURDAY ? CIERRE_SABADO : CIERRE_ENTRE_SEMANA;
         LocalTime hora = fechaReunion.toLocalTime();
 
-        if (hora.isBefore(apertura) || hora.isAfter(cierre)) {
+        if (hora.isBefore(HORA_APERTURA) || hora.isAfter(HORA_CIERRE)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    dia == DayOfWeek.SATURDAY
-                            ? "Los sabados se atiende de " + apertura + " a " + cierre + "."
-                            : "La hora debe estar entre las " + apertura + " y las " + cierre + ".");
+                    "La hora debe estar entre las " + HORA_APERTURA + " y las " + HORA_CIERRE + ".");
         }
     }
 
