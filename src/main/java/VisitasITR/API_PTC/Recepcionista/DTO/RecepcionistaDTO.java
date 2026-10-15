@@ -1,5 +1,6 @@
 package VisitasITR.API_PTC.Recepcionista.DTO;
 
+import VisitasITR.API_PTC.Config.Patrones;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -13,10 +14,12 @@ public class RecepcionistaDTO {
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 50, message = "Máximo 50 caracteres")
+    @Pattern(regexp = Patrones.SOLO_LETRAS, message = "El nombre solo puede llevar letras")
     private String recNombre;
 
     @NotBlank(message = "El apellido es obligatorio")
     @Size(max = 50, message = "Máximo 50 caracteres")
+    @Pattern(regexp = Patrones.SOLO_LETRAS, message = "El apellido solo puede llevar letras")
     private String recApellido;
 
     @NotBlank(message = "El correo es obligatorio")

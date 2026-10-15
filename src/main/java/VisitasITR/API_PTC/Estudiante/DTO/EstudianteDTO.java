@@ -1,5 +1,6 @@
 package VisitasITR.API_PTC.Estudiante.DTO;
 
+import VisitasITR.API_PTC.Config.Patrones;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -12,9 +13,11 @@ public class EstudianteDTO {
     private Long idEstudiante;
 
     @NotBlank(message = "Nombre obligatorio")
+    @Pattern(regexp = Patrones.SOLO_LETRAS, message = "El nombre solo puede llevar letras")
     private String estNombre;
 
     @NotBlank(message = "Apellido obligatorio")
+    @Pattern(regexp = Patrones.SOLO_LETRAS, message = "El apellido solo puede llevar letras")
     private String estApellido;
 
     @NotBlank(message = "Correo obligatorio")
