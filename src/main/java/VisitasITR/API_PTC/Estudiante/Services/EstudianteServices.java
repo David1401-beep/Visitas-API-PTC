@@ -1,9 +1,11 @@
 package VisitasITR.API_PTC.Estudiante.Services;
 
+import VisitasITR.API_PTC.Academica.Entity.AcademicaEntity;
 import VisitasITR.API_PTC.Academica.Repository.AcademicaRepository;
 import VisitasITR.API_PTC.Estudiante.DTO.EstudianteDTO;
 import VisitasITR.API_PTC.Estudiante.Entity.EstudianteEntity;
 import VisitasITR.API_PTC.Estudiante.Repository.EstudianteRepository;
+import VisitasITR.API_PTC.Grado.Entity.GradoEntity;
 import VisitasITR.API_PTC.Grado.Repository.GradoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -77,6 +79,10 @@ public class EstudianteServices {
             );
         }
 
+        AcademicaEntity academica = buscarAcademica(dto.getIdAcademica());
+        GradoEntity grado = buscarGrado(dto.getIdGrado());
+        validarSeccionDelGrado(grado, academica);
+
         EstudianteEntity entity = EstudianteEntity.builder()
 
                 .estNombre(dto.getEstNombre())
@@ -100,20 +106,8 @@ public class EstudianteServices {
                                 : "ESTUDIANTE"
                 )
 
-                .academica(
-                        academicaRepository
-                                .findById(dto.getIdAcademica())
-                                .orElseThrow(() ->
-                                        new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND,
-                                                "Académica no encontrada"
-                                        )
-                                )
-                )
-
-                .grado(gradoRepository.findById(dto.getIdGrado())
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grado no encontrado"))
-                )
+                .academica(academica)
+                .grado(grado)
                 .build();
 
         return toDTO(repository.save(entity));
@@ -157,25 +151,50 @@ public class EstudianteServices {
         }
 
 
-        entity.setAcademica(
-                academicaRepository.findById(dto.getIdAcademica())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Académica no encontrada"))
-        );
+        AcademicaEntity academica = buscarAcademica(dto.getIdAcademica());
+        GradoEntity grado = buscarGrado(dto.getIdGrado());
+        validarSeccionDelGrado(grado, academica);
 
-
-        entity.setGrado(
-                gradoRepository
-                        .findById(dto.getIdGrado())
-                        .orElseThrow(() ->
-                                new ResponseStatusException(
-                                        HttpStatus.NOT_FOUND,
-                                        "Grado no encontrado"
-                                )
-                        )
-        );
+        entity.setAcademica(academica);
+        entity.setGrado(grado);
 
 
         return toDTO(repository.save(entity));
+    }
+
+    private AcademicaEntity buscarAcademica(Long id) {
+        return academicaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Académica no encontrada"));
+    }
+
+    private GradoEntity buscarGrado(Long id) {
+        return gradoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Grado no encontrado"));
+    }
+
+    // En tercer ciclo las secciones son solo una letra (A, B, C...) y en
+    // bachillerato llevan letra y numero (A1, B2...). La pagina ya filtra la
+    // lista, pero aqui se revisa por si alguien manda otra combinacion.
+    private void validarSeccionDelGrado(GradoEntity grado, AcademicaEntity academica) {
+        String nivel = grado.getNivel().getNivel().toUpperCase();
+        String seccion = academica.getAcademica().trim().toUpperCase();
+
+        boolean valida;
+
+        if (nivel.contains("TERCER CICLO")) {
+            valida = seccion.matches("[A-Z]");
+        } else if (nivel.contains("BACHILLERATO")) {
+            valida = seccion.matches("[A-Z]\\d");
+        } else {
+            return;
+        }
+
+        if (!valida) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La sección " + seccion + " no corresponde a " + grado.getNivel().getNivel().toLowerCase() + "."
+            );
+        }
     }
 
 
