@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,7 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final CookieJwt cookieJwt;
 
     @Override
     protected void doFilterInternal(
@@ -59,6 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 autenticacion.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(autenticacion);
+
+                renovarSesion(request, response, usuario);
             } catch (JwtException | IllegalArgumentException excepcion) {
                 // Si el token esta malo o ya vencio, lo dejo sin sesion
                 // y mas adelante se responde 401.
@@ -67,6 +71,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    // Cada peticion con una sesion valida recibe un token nuevo con otros 15
+    // minutos. Asi la sesion solo se vence despues de 15 minutos SIN actividad;
+    // antes se vencia a los 15 minutos de haber entrado, aunque se estuviera
+    // usando.
+    //
+    // En el inicio y el cierre de sesion no se renueva: el inicio ya entrega su
+    // propio token, y en el cierre una cookie renovada pelearia con la que se
+    // esta borrando.
+    private void renovarSesion(HttpServletRequest request, HttpServletResponse response,
+                               UsuarioAutenticado usuario) {
+        String ruta = request.getRequestURI();
+
+        if (ruta.endsWith("/auth/login") || ruta.endsWith("/auth/logout")
+                || ruta.endsWith("/usuarios/inicio-sesion-encargado")) {
+            return;
+        }
+
+        String nuevo = jwtService.generarToken(usuario.email(), usuario.rol(), usuario.id());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieJwt.crear(nuevo).toString());
     }
 
     private String obtenerToken(HttpServletRequest request) {

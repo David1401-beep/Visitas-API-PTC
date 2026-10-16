@@ -41,16 +41,22 @@ public class JwtService {
     // Arma el token al iniciar sesion con el correo, el rol, el id y el vencimiento.
     // Va firmado pero no cifrado (cualquiera puede leerlo), por eso no lleva la contrasena.
     public String generarToken(AuthEntity usuario) {
+        return generarToken(usuario.getEmail(), usuario.getRol(), usuario.getId());
+    }
+
+    // Lo usa tambien el filtro para renovar la sesion con los datos del token
+    // anterior, sin volver a consultar la base en cada peticion.
+    public String generarToken(String email, String rol, Long id) {
         Instant ahora = Instant.now();
         var builder = Jwts.builder()
-                .setSubject(usuario.getEmail())
-                .claim("rol", usuario.getRol())
+                .setSubject(email)
+                .claim("rol", rol)
                 .setIssuedAt(Date.from(ahora))
                 .setExpiration(Date.from(ahora.plusMillis(expirationMs)))
                 .signWith(signingKey, SignatureAlgorithm.HS256);
 
-        if (usuario.getId() != null) {
-            builder.claim("idUsuario", usuario.getId());
+        if (id != null) {
+            builder.claim("idUsuario", id);
         }
 
         return builder.compact();
