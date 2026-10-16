@@ -28,6 +28,13 @@ public class DocenteController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Lista de docentes obtenida con éxito.", lista));
     }
 
+    // La usa el formulario del admin para mostrar que clave le va a tocar al nuevo docente.
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @GetMapping("/siguiente-clave")
+    public ResponseEntity<ApiResponse<String>> siguienteClave() {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Siguiente clave de docente.", docenteServices.siguienteClave()));
+    }
+
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<DocenteDTO>> obtenerPorId(@PathVariable Long id) {

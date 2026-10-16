@@ -66,7 +66,7 @@ public class DocenteServices {
         DocenteEntity entity = DocenteEntity.builder()
                 .docNombre(dto.getDocNombre())
                 .docApellido(dto.getDocApellido())
-                .docClave(dto.getDocClave())
+                .docClave(siguienteClave())
                 .docCorreo(dto.getDocCorreo())
 
 
@@ -106,9 +106,9 @@ public class DocenteServices {
             );
         }
 
+        // La clave no se cambia al editar: se queda la que se le dio al crearlo.
         entity.setDocNombre(dto.getDocNombre());
         entity.setDocApellido(dto.getDocApellido());
-        entity.setDocClave(dto.getDocClave());
         entity.setDocCorreo(dto.getDocCorreo());
         entity.setDocTipo(dto.getDocTipo());
 
@@ -147,6 +147,18 @@ public class DocenteServices {
         }
 
         docenteRepository.deleteById(id);
+    }
+
+    // Busca el numero mas alto de las claves DOC### y le suma uno. Las claves
+    // que no siguen ese formato no cuentan.
+    public String siguienteClave() {
+        int mayor = docenteRepository.obtenerClaves().stream()
+                .filter(clave -> clave != null && clave.trim().toUpperCase().matches("DOC\\d+"))
+                .mapToInt(clave -> Integer.parseInt(clave.trim().substring(3)))
+                .max()
+                .orElse(0);
+
+        return String.format("DOC%03d", mayor + 1);
     }
 
  //Covertir a DTO

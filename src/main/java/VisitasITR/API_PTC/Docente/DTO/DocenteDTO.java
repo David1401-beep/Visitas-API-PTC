@@ -28,8 +28,7 @@ public class DocenteDTO {
     @Pattern(regexp = Patrones.SOLO_LETRAS, message = "El apellido solo puede llevar letras")
     private String docApellido;
 
-    @NotBlank(message = "La clave es obligatoria")
-    @Size(max = 20, message = "La clave no debe exceder los 20 caracteres")
+    // La pone la API al crear el docente (DOC001, DOC002...), no se escribe a mano.
     private String docClave;
 
     @NotBlank(message = "El correo es obligatorio")
