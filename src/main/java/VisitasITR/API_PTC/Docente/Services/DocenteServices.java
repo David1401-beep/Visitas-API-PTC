@@ -149,11 +149,12 @@ public class DocenteServices {
         docenteRepository.deleteById(id);
     }
 
-    // Busca el numero mas alto de las claves DOC### y le suma uno. Las claves
-    // que no siguen ese formato no cuentan.
+    // Busca el numero mas alto de las claves DOC000 y le suma uno. Solo cuentan
+    // las de tres numeros: si una se escribio mal a mano (DOC123111) no se
+    // salta a ese numero.
     public String siguienteClave() {
         int mayor = docenteRepository.obtenerClaves().stream()
-                .filter(clave -> clave != null && clave.trim().toUpperCase().matches("DOC\\d+"))
+                .filter(clave -> clave != null && clave.trim().toUpperCase().matches("DOC\\d{3}"))
                 .mapToInt(clave -> Integer.parseInt(clave.trim().substring(3)))
                 .max()
                 .orElse(0);

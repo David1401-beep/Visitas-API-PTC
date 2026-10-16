@@ -122,6 +122,7 @@ public class AdministradorServices {
                 .admApellido(entity.getAdmApellido())
                 .admCorreo(entity.getAdmCorreo())
                 .admRol(entity.getAdmRol())
+                .admIdentificador(String.format("ADM%03d", entity.getIdAdministrador()))
                 .build();
     }
 }

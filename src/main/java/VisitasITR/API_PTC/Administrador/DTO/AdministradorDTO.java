@@ -37,4 +37,8 @@ public class AdministradorDTO {
     private String admPassword;
 
     private String admRol;
+
+    // Solo se lee: sale del ID (ADM001, ADM002...). La tabla no tiene columna
+    // para guardarlo, y el ID ya es unico y nunca cambia.
+    private String admIdentificador;
 }

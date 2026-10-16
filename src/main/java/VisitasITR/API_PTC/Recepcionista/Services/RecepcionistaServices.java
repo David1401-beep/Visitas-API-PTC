@@ -143,6 +143,7 @@ public class RecepcionistaServices {
                 .recApellido(entity.getRecApellido())
                 .recCorreo(entity.getRecCorreo())
                 .recRol(entity.getRecRol())
+                .recIdentificador(String.format("REC%03d", entity.getIdRecepcionista()))
                 .build();
     }
 }

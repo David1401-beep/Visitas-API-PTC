@@ -31,4 +31,8 @@ public class RecepcionistaDTO {
     private String recPassword;
 
     private String recRol;
+
+    // Solo se lee: sale del ID (REC001, REC002...). La tabla no tiene columna
+    // para guardarlo, y el ID ya es unico y nunca cambia.
+    private String recIdentificador;
 }
