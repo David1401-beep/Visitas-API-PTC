@@ -33,6 +33,7 @@ public class EstudianteDTO {
     private String estEspecialidad;
 
     @NotBlank(message = "Código obligatorio")
+    @Pattern(regexp = "^\\d{8}$", message = "El carnet debe tener 8 números")
     private String estCodigo;
 
     private String estRol;
