@@ -42,9 +42,10 @@ public class RecuperacionService {
 
     // Genera el codigo y lo manda por correo.
     //
-    // Pase lo que pase, quien llama recibe la misma respuesta. Si contestara
-    // distinto cuando el correo no existe, cualquiera podria averiguar que
-    // cuentas estan registradas.
+    // Si el correo no existe se avisa, para que la persona sepa que se
+    // equivoco al escribirlo en vez de quedarse esperando un codigo que nunca
+    // llega. El inicio de sesion ya dice cuando un correo no esta registrado,
+    // asi que avisarlo aqui no deja ver nada que no se supiera.
     @Transactional
     public void solicitar(SolicitarCodigoDTO peticion) {
         String correo = normalizar(peticion.getEmail());
@@ -52,7 +53,8 @@ public class RecuperacionService {
         Optional<AuthEntity> usuario = authRepository.findByEmailIgnoreCase(correo);
 
         if (usuario.isEmpty()) {
-            return;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Este correo no está registrado en el sistema.");
         }
 
         // Al pedir uno nuevo, los codigos anteriores dejan de servir.

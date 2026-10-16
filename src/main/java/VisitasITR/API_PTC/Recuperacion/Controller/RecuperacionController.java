@@ -31,7 +31,7 @@ public class RecuperacionController {
 
         return ResponseEntity.ok(new ApiResponse<>(
                 true,
-                "Si el correo está registrado, enviamos un código para continuar.",
+                "Enviamos un código a su correo para continuar.",
                 null
         ));
     }
