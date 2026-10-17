@@ -3,6 +3,7 @@ package VisitasITR.API_PTC.Academica.Services;
 import VisitasITR.API_PTC.Academica.DTO.AcademicaDTO;
 import VisitasITR.API_PTC.Academica.Entity.AcademicaEntity;
 import VisitasITR.API_PTC.Academica.Repository.AcademicaRepository;
+import VisitasITR.API_PTC.Estudiante.Repository.EstudianteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class AcademicaService {
 
     private final AcademicaRepository repository;
+    private final EstudianteRepository estudianteRepository;
 
     public List<AcademicaDTO> obtenerTodos() {
         return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
@@ -53,12 +55,22 @@ public class AcademicaService {
         return academica.trim().toUpperCase();
     }
 
+    // Una seccion con estudiantes no se borra: se quedarian sin seccion. Solo
+    // se puede eliminar cuando ya nadie la usa.
     @Transactional
     public void eliminar(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Académica no encontrada: " + id);
+        AcademicaEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Académica no encontrada: " + id));
+
+        long estudiantes = estudianteRepository.countByAcademica_IdAcademica(id);
+
+        if (estudiantes > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "No se puede eliminar la sección " + entity.getAcademica() + ": tiene "
+                            + estudiantes + (estudiantes == 1 ? " estudiante asignado." : " estudiantes asignados."));
         }
-        repository.deleteById(id);
+
+        repository.delete(entity);
     }
 
     private AcademicaDTO toDTO(AcademicaEntity entity) {

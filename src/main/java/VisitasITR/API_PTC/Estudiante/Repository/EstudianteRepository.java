@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface EstudianteRepository extends JpaRepository<EstudianteEntity, Long> {
     boolean existsByEstCorreo(String estCorreo);
     boolean existsByEstCodigo(String estCodigo);
+    long countByAcademica_IdAcademica(Long idAcademica);
 }
