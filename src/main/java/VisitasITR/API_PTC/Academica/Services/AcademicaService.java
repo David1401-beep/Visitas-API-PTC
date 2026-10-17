@@ -30,10 +30,12 @@ public class AcademicaService {
 
     @Transactional
     public AcademicaDTO crear(AcademicaDTO dto) {
-        if (repository.existsByAcademica(dto.getAcademica())) {
+        String nombre = normalizar(dto.getAcademica());
+
+        if (repository.existsByAcademica(nombre)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La sección académica ya existe.");
         }
-        AcademicaEntity entity = AcademicaEntity.builder().academica(dto.getAcademica()).build();
+        AcademicaEntity entity = AcademicaEntity.builder().academica(nombre).build();
         return toDTO(repository.save(entity));
     }
 
@@ -41,8 +43,14 @@ public class AcademicaService {
     public AcademicaDTO actualizar(Long id, AcademicaDTO dto) {
         AcademicaEntity entity = repository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Académica no encontrada: " + id));
-        entity.setAcademica(dto.getAcademica());
+        entity.setAcademica(normalizar(dto.getAcademica()));
         return toDTO(repository.save(entity));
+    }
+
+    // Se guarda siempre en mayuscula y sin espacios, para que "b5" y "B5" no
+    // queden como dos secciones distintas.
+    private String normalizar(String academica) {
+        return academica.trim().toUpperCase();
     }
 
     @Transactional
