@@ -124,6 +124,7 @@ public class CitaReunionService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita de reunion no encontrada: " + id));
 
         validarAcceso(entity);
+        validarQueSigaPendiente(entity);
         validarHorario(dto.getCitFechaReunion());
         validarCambioDeFecha(entity.getCitFechaReunion(), dto.getCitFechaReunion());
 
@@ -143,6 +144,7 @@ public class CitaReunionService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Cita de reunion no encontrada: " + id));
 
         validarAcceso(entity);
+        validarQueNoEsteCerrada(entity);
 
         if (updates.containsKey("citEstado")) {
             String estado = (String) updates.get("citEstado");
@@ -198,6 +200,27 @@ public class CitaReunionService {
         if (estado == null || !validos.contains(estado)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Estado no valido: " + estado + ". Use " + String.join(", ", validos));
+        }
+    }
+
+    // Editar la cita completa (fecha, asunto, estudiante) solo se puede
+    // mientras esta pendiente. Ya aceptada o rechazada, la otra persona ya
+    // respondio a esos datos y cambiarlos por detras no seria justo.
+    private void validarQueSigaPendiente(CitaReunionEntity cita) {
+        if (!"PENDIENTE".equals(cita.getCitEstado())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Solo se pueden editar las citas pendientes. Esta ya esta "
+                            + String.valueOf(cita.getCitEstado()).toLowerCase() + ".");
+        }
+    }
+
+    // Rechazada, cancelada o finalizada es el final de la cita: ya no se
+    // le cambia nada. Las aceptadas si pueden seguir (posponerla o marcarla
+    // como finalizada), pero eso va por su propio boton, no por editar.
+    private void validarQueNoEsteCerrada(CitaReunionEntity cita) {
+        if (List.of("RECHAZADA", "CANCELADA", "FINALIZADA").contains(cita.getCitEstado())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Esta cita ya esta " + cita.getCitEstado().toLowerCase() + " y no se puede modificar.");
         }
     }
 
