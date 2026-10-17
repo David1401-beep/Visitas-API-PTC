@@ -18,4 +18,6 @@ public interface MateriaDocenteRepository extends JpaRepository<MateriaDocenteEn
     List<MateriaDocenteEntity> findByMateria_IdMateria(Long idMateria);
 
     boolean existsByMateria_IdMateriaAndDocente_IdDocente(Long idMateria, Long idDocente);
+
+    long countByMateria_IdMateria(Long idMateria);
 }

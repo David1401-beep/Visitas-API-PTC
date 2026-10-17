@@ -3,6 +3,7 @@ package VisitasITR.API_PTC.Materia.Services;
 import VisitasITR.API_PTC.Materia.DTO.MateriaDTO;
 import VisitasITR.API_PTC.Materia.Entity.MateriaEntity;
 import VisitasITR.API_PTC.Materia.Repository.MateriaRepository;
+import VisitasITR.API_PTC.Materia_Docente.Repository.MateriaDocenteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class MateriaService {
 
     private final MateriaRepository repository;
+    private final MateriaDocenteRepository materiaDocenteRepository;
 
     public List<MateriaDTO> obtenerTodos() {
         return repository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
@@ -49,12 +51,23 @@ public class MateriaService {
         return toDTO(repository.save(entity));
     }
 
+    // Una materia que algun docente imparte no se borra: primero hay que
+    // quitarsela en "Materias por docente".
     @Transactional
     public void eliminar(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Materia no encontrada: " + id);
+        MateriaEntity entity = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Materia no encontrada: " + id));
+
+        long docentes = materiaDocenteRepository.countByMateria_IdMateria(id);
+
+        if (docentes > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "No se puede eliminar la materia " + entity.getMatNombre() + ": la imparte"
+                            + (docentes == 1 ? " 1 docente." : "n " + docentes + " docentes.")
+                            + " Quítela primero en Materias por docente.");
         }
-        repository.deleteById(id);
+
+        repository.delete(entity);
     }
 
     private MateriaDTO toDTO(MateriaEntity entity) {
